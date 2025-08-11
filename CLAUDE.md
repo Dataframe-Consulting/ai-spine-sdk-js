@@ -72,8 +72,58 @@ Tests are located in `src/__tests__/` and use Jest with a setup file for common 
 ### API Integration
 
 The SDK communicates with the AI Spine API at `https://ai-spine-api-production.up.railway.app` by default. All requests include:
-- Authentication via `X-API-Key` header
-- Request ID tracking via `X-Request-ID`
-- SDK version via `X-SDK-Version`
+- Authentication via `Authorization: Bearer {apiKey}` header (optional - API_KEY_REQUIRED=false)
+- Content-Type and Accept headers set to `application/json`
 - Automatic retry logic with exponential backoff
-- Rate limit handling
+- Timeout handling
+
+### Important Project Context
+
+**Current Status:**
+- API is live at Railway but no real agents are connected yet
+- Authentication is currently disabled (API_KEY_REQUIRED=false)
+- Webhooks are NOT implemented - use polling with `waitForExecution()`
+- Only HTTP/HTTPS protocols are supported for agent endpoints
+
+**Package Publishing:**
+- Published to npm as `ai-spine-sdk` (not @ai-spine/sdk)
+- Repository: https://github.com/Dataframe-Consulting/ai-spine-sdk-js
+- Homepage: https://www.dataframeai.com/
+
+**API Endpoints Available:**
+- POST /flows/execute
+- GET /executions/{executionId}
+- GET /flows
+- GET /flows/{flowId}
+- GET /agents
+- POST /agents
+- DELETE /agents/{agentId} (Note: No PUT/update endpoint)
+- GET /health
+- GET /status
+- GET /metrics
+- POST /executions/{executionId}/cancel
+
+**Request/Response Format:**
+```javascript
+// Execute Flow Request
+{
+  "flow_id": "credit_analysis",
+  "input_data": { /* user data */ },
+  "metadata": {}
+}
+
+// Response
+{
+  "execution_id": "uuid",
+  "status": "pending|running|completed|failed",
+  "result": null
+}
+```
+
+### Development Guidelines
+
+1. **No Webhooks**: Don't implement or suggest webhook features - they're not supported
+2. **Optional API Key**: Allow SDK to work without API key since it's currently disabled
+3. **Use Polling**: Always use `waitForExecution()` for monitoring execution status
+4. **Production URL**: Default to Railway URL, not localhost
+5. **Test Considerations**: Some tests may fail due to config changes (API key optional, URL changed) - this is expected
