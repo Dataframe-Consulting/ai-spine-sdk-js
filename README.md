@@ -16,17 +16,22 @@ yarn add ai-spine-sdk
 pnpm add ai-spine-sdk
 ```
 
-### Basic Usage
+### Basic usage
 
 ```typescript
 import { AISpine } from 'ai-spine-sdk';
 
-// Initialize with your API key
-const spine = new AISpine('sk_test_your_api_key_here');
+// Initialize SDK (API key is optional - backend currently has API_KEY_REQUIRED=false)
+const spine = new AISpine();  // Will use production API by default
 
-// Execute a flow
-const result = await spine.executeFlow('customer-support', {
-  message: 'I need help with my order'
+// Check API health
+const health = await spine.healthCheck();
+console.log('API Status:', health.status);
+
+// Execute a flow (example: credit analysis)
+const result = await spine.executeFlow('credit_analysis', {
+  user_query: 'Necesito un préstamo de 50000',
+  amount: 50000
 });
 
 console.log('Execution started:', result.execution_id);
@@ -37,6 +42,13 @@ console.log('Final result:', execution.output_data);
 ```
 
 ## 📚 Documentation
+
+### ⚠️ Important notes
+
+- **API Status**: The API is currently running at `https://ai-spine-api-production.up.railway.app`
+- **Authentication**: API keys are currently optional (`API_KEY_REQUIRED=false`)
+- **Agents**: No real agents are connected yet - flows will fail until agents are registered
+- **Webhooks**: Not implemented - use polling with `waitForExecution()` instead
 
 ### Configuration
 
@@ -55,9 +67,9 @@ const spine = new AISpine({
 });
 ```
 
-### Flow Execution
+### Flow execution
 
-#### Execute a Flow
+#### Execute a flow
 
 ```typescript
 // Simple execution
@@ -72,7 +84,7 @@ const result = await spine.executeFlow('long-running-task',
 );
 ```
 
-#### Wait for Completion
+#### Wait for completion
 
 ```typescript
 // Wait with progress updates
@@ -90,7 +102,7 @@ const execution = await spine.waitForExecution(result.execution_id, {
 console.log('Final result:', execution.output_data);
 ```
 
-#### Get Execution Status
+#### Get execution status
 
 ```typescript
 // Get current status
@@ -106,9 +118,9 @@ if (execution.status === 'completed') {
 }
 ```
 
-### Flow Management
+### Flow management
 
-#### List Available Flows
+#### List available flows
 
 ```typescript
 const flows = await spine.listFlows();
@@ -119,7 +131,7 @@ flows.forEach(flow => {
 });
 ```
 
-#### Get Flow Details
+#### Get flow details
 
 ```typescript
 const flow = await spine.getFlow('customer-support');
@@ -132,9 +144,9 @@ flow.nodes.forEach(node => {
 });
 ```
 
-### Agent Management
+### Agent management
 
-#### List Registered Agents
+#### List registered agents
 
 ```typescript
 const agents = await spine.listAgents();
@@ -146,7 +158,7 @@ agents.forEach(agent => {
 });
 ```
 
-#### Register a New Agent
+#### Register a new agent
 
 ```typescript
 const agent = await spine.registerAgent({
@@ -161,7 +173,7 @@ const agent = await spine.registerAgent({
 console.log(`Agent registered: ${agent.agent_id}`);
 ```
 
-#### Test Agent Connection
+#### Test agent connection
 
 ```typescript
 const testResult = await spine.testAgent('https://my-agent.example.com/api');
@@ -173,7 +185,7 @@ if (testResult.connected) {
 }
 ```
 
-### Batch Processing
+### Batch processing
 
 Execute multiple flows in parallel with automatic concurrency control:
 
@@ -204,9 +216,9 @@ results.forEach(result => {
 });
 ```
 
-### System Monitoring
+### System monitoring
 
-#### Health Check
+#### Health check
 
 ```typescript
 const health = await spine.healthCheck();
@@ -217,7 +229,7 @@ console.log(`Database: ${health.database}`);
 console.log(`Uptime: ${health.uptime}s`);
 ```
 
-#### Get Metrics
+#### Get metrics
 
 ```typescript
 const metrics = await spine.getMetrics();
@@ -227,11 +239,11 @@ console.log(`Success rate: ${(metrics.successful_executions / metrics.total_exec
 console.log(`Average execution time: ${metrics.average_execution_time}ms`);
 ```
 
-### Environment Variables (NEW in v2.1.0)
+### Environment variables (NEW in v2.1.0)
 
 The SDK now supports environment variable management for agents, making it easy to handle API keys, credentials, and configuration.
 
-#### Register Agent with Environment Schema
+#### Register agent with environment schema
 
 ```typescript
 const agent = await spine.registerAgent({
@@ -263,7 +275,7 @@ const agent = await spine.registerAgent({
 });
 ```
 
-#### Validate Environment Variables
+#### Validate environment variables
 
 ```typescript
 // Get environment schema for an agent
@@ -284,7 +296,7 @@ if (!result.valid) {
 }
 ```
 
-#### Use Environment Variables in Flows
+#### Use environment variables in flows
 
 ```typescript
 const flow = await spine.createFlow({
@@ -309,7 +321,7 @@ const flow = await spine.createFlow({
 });
 ```
 
-#### Environment Field Types
+#### Environment field types
 
 - **`string`**: Regular text fields
 - **`number`**: Numeric values
@@ -318,7 +330,7 @@ const flow = await spine.createFlow({
 
 ## 🔧 Advanced Usage
 
-### Error Handling
+### Error handling
 
 The SDK provides detailed error classes for different scenarios:
 
@@ -360,7 +372,7 @@ try {
 }
 ```
 
-### Custom Configuration Updates
+### Custom configuration updates
 
 ```typescript
 // Update configuration at runtime
@@ -374,7 +386,7 @@ const config = spine.getConfig();
 console.log('Current base URL:', config.baseURL);
 ```
 
-### Input Validation and Sanitization
+### Input validation and sanitization
 
 The SDK automatically validates and sanitizes inputs:
 
@@ -399,7 +411,7 @@ const result = await spine.executeFlow('my-flow', {
 
 ## 🌟 Examples
 
-### Customer Support Bot
+### Customer support bot
 
 ```typescript
 import { AISpine } from 'ai-spine-sdk';
@@ -449,7 +461,7 @@ if (response.escalate) {
 }
 ```
 
-### Content Generation Pipeline
+### Content generation pipeline
 
 ```typescript
 async function generateContent(topic: string, style: string) {
@@ -522,141 +534,51 @@ const result = await spine.executeFlow('customer-support', {
 } as CustomerSupportInput);
 ```
 
-## 🪝 Webhooks
+## 📡 Available Endpoints
 
-Set up webhooks to receive real-time notifications about AI Spine events:
+The SDK provides access to the following AI Spine API endpoints:
 
-### Creating Webhooks
+### Core operations
+- `executeFlow(flowId, inputData)` - Execute an AI workflow
+- `getExecution(executionId)` - Get execution status and results
+- `waitForExecution(executionId, options)` - Poll until execution completes
+- `cancelExecution(executionId)` - Cancel a running execution
 
-```typescript
-// Create a webhook endpoint
-const webhook = await spine.createWebhook({
-  url: 'https://your-app.com/webhooks/ai-spine',
-  events: [
-    'execution.completed',
-    'execution.failed',
-    'agent.registered'
-  ],
-  secret: 'whsec_your_secret_key'
-});
+### Flow management
+- `listFlows()` - List all available flows
+- `getFlow(flowId)` - Get flow details and configuration
 
-console.log(webhook.webhook_id);
-```
+### Agent management
+- `listAgents()` - List all registered agents
+- `createAgent(agentConfig)` - Register a new agent
+- `deleteAgent(agentId)` - Remove an agent
 
-### Handling Webhook Events
+### System information
+- `healthCheck()` - Check API health status
+- `getMetrics()` - Get system metrics
 
-```typescript
-// Register event handlers
-spine.onWebhook('execution.completed', (event) => {
-  console.log(`Execution ${event.data.execution.execution_id} completed!`);
-  console.log('Result:', event.data.execution.output_data);
-});
+## 📊 Monitoring Executions
 
-spine.onWebhook('execution.failed', (event) => {
-  console.error(`Execution failed: ${event.data.execution.error_message}`);
-});
-
-// Handle all events with wildcard
-spine.onWebhook('*', (event) => {
-  console.log(`Event received: ${event.event}`);
-});
-```
-
-### Webhook Server Example
+AI Spine uses polling to check execution status. The SDK provides convenient methods to wait for completion:
 
 ```typescript
-import express from 'express';
-import { createWebhookMiddleware, WebhookSignature } from '@ai-spine/sdk';
+// Execute and wait for completion
+const result = await spine.executeFlow('analysis-flow', inputData);
 
-const app = express();
-const webhookSecret = 'whsec_your_secret_key';
-
-// Use middleware for automatic signature verification
-app.use('/webhooks/ai-spine', express.raw({ type: 'application/json' }));
-app.use('/webhooks/ai-spine', createWebhookMiddleware(webhookSecret));
-
-app.post('/webhooks/ai-spine', (req, res) => {
-  const event = JSON.parse(req.body);
-  
-  switch (event.event) {
-    case 'execution.completed':
-      handleExecutionCompleted(event.data.execution);
-      break;
-    case 'execution.failed':
-      handleExecutionFailed(event.data.execution);
-      break;
-    case 'agent.registered':
-      handleAgentRegistered(event.data.agent);
-      break;
+// Wait with custom options
+const execution = await spine.waitForExecution(result.execution_id, {
+  timeout: 300000,    // Maximum wait time: 5 minutes
+  interval: 2000,     // Check every 2 seconds
+  onProgress: (status) => {
+    console.log(`Current status: ${status.status}`);
   }
-  
-  res.status(200).json({ received: true });
 });
 
-app.listen(3000);
+// Or check status manually
+const status = await spine.getExecution(result.execution_id);
+console.log(`Status: ${status.status}`); // 'pending' | 'running' | 'completed' | 'failed'
 ```
 
-### Manual Signature Verification
-
-```typescript
-import { WebhookSignature } from '@ai-spine/sdk';
-
-// Verify webhook signature manually
-const signature = req.headers['x-ai-spine-signature'];
-const payload = req.body;
-const secret = 'whsec_your_secret_key';
-
-const verification = WebhookSignature.verify(signature, payload, secret);
-
-if (!verification.valid) {
-  return res.status(401).json({ error: verification.error });
-}
-
-// Process webhook...
-```
-
-### Webhook Management
-
-```typescript
-// List all webhooks
-const webhooks = await spine.listWebhooks();
-
-// Update webhook configuration
-const updated = await spine.updateWebhook(webhookId, {
-  events: ['*'], // Listen to all events
-  active: true
-});
-
-// Test webhook endpoint
-const delivery = await spine.testWebhook(webhookId, 'execution.completed');
-
-// View delivery history
-const deliveries = await spine.getWebhookDeliveries(webhookId);
-
-// Retry failed delivery
-if (delivery.status === 'failed') {
-  await spine.retryWebhookDelivery(webhookId, delivery.id);
-}
-
-// Delete webhook
-await spine.deleteWebhook(webhookId);
-```
-
-### Supported Events
-
-- `execution.started` - When a flow execution begins
-- `execution.completed` - When a flow execution completes successfully
-- `execution.failed` - When a flow execution fails
-- `execution.node.completed` - When a node in a flow completes
-- `execution.node.failed` - When a node in a flow fails
-- `agent.registered` - When a new agent is registered
-- `agent.updated` - When an agent configuration is updated
-- `agent.removed` - When an agent is removed
-- `flow.created` - When a new flow is created
-- `flow.updated` - When a flow is updated
-- `flow.deleted` - When a flow is deleted
-- `system.health.changed` - When system health status changes
-- `*` - All events (wildcard)
 
 ## 🐛 Debugging
 
