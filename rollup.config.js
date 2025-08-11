@@ -1,11 +1,11 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import dts from 'rollup-plugin-dts';
+const resolve = require('@rollup/plugin-node-resolve').default;
+const commonjs = require('@rollup/plugin-commonjs').default;
+const typescript = require('@rollup/plugin-typescript').default;
+const dts = require('rollup-plugin-dts').default;
 
 const packageJson = require('./package.json');
 
-export default [
+module.exports = [
   // ES Modules and CommonJS builds
   {
     input: 'src/index.ts',
@@ -27,6 +27,9 @@ export default [
       typescript({
         tsconfig: './tsconfig.json',
         exclude: ['**/*.test.ts', '**/*.spec.ts'],
+        declaration: true,
+        declarationDir: 'dist/types',
+        rootDir: 'src',
       }),
     ],
     external: ['axios'],

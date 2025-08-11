@@ -19,22 +19,20 @@ import {
 
 export class AISpineClient {
   private readonly http: AxiosInstance;
-  private readonly config: Required<AISpineConfig>;
+  private readonly config: Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string };
 
   constructor(config: AISpineConfig) {
     // Set defaults
     this.config = {
-      baseURL: 'http://localhost:8000/api/v1',
+      baseURL: 'https://ai-spine-api-production.up.railway.app',
       timeout: 30000,
       retries: 3,
       debug: false,
       ...config,
     };
 
-    // Validate required config
-    if (!this.config.apiKey) {
-      throw new AISpineError('API key is required', 'MISSING_API_KEY');
-    }
+    // API key is optional since backend has API_KEY_REQUIRED=false
+    // But we'll still send it if provided
 
     // Create axios instance
     this.http = axios.create({
@@ -42,8 +40,9 @@ export class AISpineClient {
       timeout: this.config.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'User-Agent': '@ai-spine/sdk-js/0.1.0',
+        'Accept': 'application/json',
+        ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        'User-Agent': '@ai-spine/sdk-js/2.1.0',
       },
     });
 
@@ -234,7 +233,7 @@ export class AISpineClient {
 
   // Utility Methods
 
-  public getConfig(): Required<AISpineConfig> {
+  public getConfig(): Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string } {
     return { ...this.config };
   }
 

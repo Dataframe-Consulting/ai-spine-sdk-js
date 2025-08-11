@@ -10,7 +10,7 @@ async function main() {
   // Initialize the SDK
   const spine = new AISpine({
     apiKey: process.env.AI_SPINE_API_KEY || 'sk_test_your_api_key_here',
-    baseURL: 'http://localhost:8000/api/v1', // Your AI Spine instance
+    // baseURL: 'https://ai-spine-api-production.up.railway.app/api/v1', // Default production API
     debug: true, // Enable debug logging
   });
 

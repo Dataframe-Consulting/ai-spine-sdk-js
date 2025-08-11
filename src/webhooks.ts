@@ -84,7 +84,7 @@ export class WebhookSignature {
     } catch (error) {
       return { 
         valid: false, 
-        error: `Signature verification failed: ${error.message}` 
+        error: `Signature verification failed: ${error instanceof Error ? error.message : String(error)}` 
       };
     }
   }

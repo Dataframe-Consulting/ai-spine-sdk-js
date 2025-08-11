@@ -59,7 +59,7 @@ export function validateAgentId(agentId: string): boolean {
 }
 
 /**
- * Validates a URL format
+ * Validates a URL format (only HTTP/HTTPS allowed)
  */
 export function validateUrl(url: string): boolean {
   if (!url || typeof url !== 'string') {
@@ -67,8 +67,8 @@ export function validateUrl(url: string): boolean {
   }
   
   try {
-    new URL(url);
-    return true;
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
   } catch {
     return false;
   }
@@ -84,6 +84,7 @@ export function validateFlowInput(input: any): ValidationErrorType[] {
     errors.push({
       field: 'input',
       message: 'Input data is required',
+      code: 'required',
       value: input,
     });
     return errors;
@@ -93,6 +94,7 @@ export function validateFlowInput(input: any): ValidationErrorType[] {
     errors.push({
       field: 'input',
       message: 'Input must be an object',
+      code: 'invalid_type',
       value: input,
     });
   }
@@ -110,6 +112,7 @@ export function validateAgentConfig(config: any): ValidationErrorType[] {
     errors.push({
       field: 'config',
       message: 'Agent configuration is required',
+      code: 'required',
       value: config,
     });
     return errors;
@@ -123,6 +126,7 @@ export function validateAgentConfig(config: any): ValidationErrorType[] {
       errors.push({
         field,
         message: `${field} is required`,
+        code: 'required',
         value: config[field],
       });
     }
@@ -133,6 +137,7 @@ export function validateAgentConfig(config: any): ValidationErrorType[] {
     errors.push({
       field: 'agent_id',
       message: 'Invalid agent ID format',
+      code: 'invalid_value',
       value: config.agent_id,
     });
   }
@@ -141,6 +146,7 @@ export function validateAgentConfig(config: any): ValidationErrorType[] {
     errors.push({
       field: 'endpoint',
       message: 'Invalid endpoint URL',
+      code: 'invalid_value',
       value: config.endpoint,
     });
   }
@@ -149,6 +155,7 @@ export function validateAgentConfig(config: any): ValidationErrorType[] {
     errors.push({
       field: 'capabilities',
       message: 'Capabilities must be an array',
+      code: 'invalid_type',
       value: config.capabilities,
     });
   }

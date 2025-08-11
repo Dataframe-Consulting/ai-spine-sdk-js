@@ -1,0 +1,79 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Development Commands
+
+```bash
+# Build the SDK
+npm run build
+
+# Development mode with watch
+npm run dev
+
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run a single test file
+npm test -- src/__tests__/spine.test.ts
+
+# Lint the codebase
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Type checking
+npm run typecheck
+```
+
+## Architecture Overview
+
+This is the AI Spine JavaScript SDK - a TypeScript SDK for orchestrating AI agents and workflows, positioned as "The Stripe for AI Agent Orchestration".
+
+### Core Structure
+
+The SDK follows a clean architecture pattern with clear separation of concerns:
+
+- **AISpine** (`src/spine.ts`): Main SDK class providing the public API interface. Handles flow execution, agent management, webhooks, and environment variables.
+
+- **AISpineClient** (`src/client.ts`): HTTP client responsible for all API communication with retry logic, rate limiting, and error handling.
+
+- **Type System** (`src/types.ts`): Comprehensive TypeScript types for all SDK entities including agents, flows, executions, webhooks, and validation.
+
+- **Error Handling** (`src/errors.ts`): Hierarchical error classes for different error scenarios (authentication, validation, rate limiting, etc.).
+
+- **Utilities** (`src/utils.ts`): Validation functions, sanitization, and helper methods used throughout the SDK.
+
+- **Webhooks** (`src/webhooks.ts`): Webhook signature verification, event handling, and middleware creation for webhook endpoints.
+
+### Key Features
+
+1. **Flow Execution**: Execute AI workflows with input data and wait for completion
+2. **Agent Management**: Create, update, and manage AI agents with environment variables
+3. **Batch Processing**: Execute multiple flows or agents in parallel
+4. **Webhook Integration**: Secure webhook verification and event handling
+5. **Environment Variables**: Secure configuration management for agents (v2.1.0 feature)
+
+### Build Configuration
+
+- **Rollup**: Used for bundling with support for CommonJS, ESM, and TypeScript declarations
+- **TypeScript**: Strict mode enabled for type safety
+- **Jest**: Test runner with ts-jest for TypeScript support
+- **ESLint**: Code linting with TypeScript ESLint parser
+
+### Testing
+
+Tests are located in `src/__tests__/` and use Jest with a setup file for common mocks. The test environment simulates node and includes coverage reporting.
+
+### API Integration
+
+The SDK communicates with the AI Spine API at `https://ai-spine-api-production.up.railway.app` by default. All requests include:
+- Authentication via `X-API-Key` header
+- Request ID tracking via `X-Request-ID`
+- SDK version via `X-SDK-Version`
+- Automatic retry logic with exponential backoff
+- Rate limit handling

@@ -131,4 +131,5 @@ export {
 export const VERSION = '2.1.0';
 
 // Default export for convenience
-export default AISpine;
+import { AISpine as DefaultExport } from './spine';
+export default DefaultExport;

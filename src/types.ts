@@ -6,8 +6,8 @@
 
 // Configuration Types
 export interface AISpineConfig {
-  /** API key for authentication */
-  apiKey: string;
+  /** API key for authentication (optional - backend has API_KEY_REQUIRED=false) */
+  apiKey?: string;
   /** Base URL for the AI Spine API */
   baseURL?: string;
   /** Request timeout in milliseconds */
@@ -90,7 +90,7 @@ export interface Flow {
 
 export interface FlowExecutionRequest {
   flow_id: string;
-  input: Record<string, any>;
+  input_data: Record<string, any>;
   metadata?: Record<string, any>;
 }
 

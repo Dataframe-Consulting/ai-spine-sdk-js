@@ -55,8 +55,8 @@ export class AISpine {
       ? { apiKey: config }
       : config;
 
-    // Validate API key
-    if (!validateApiKey(finalConfig.apiKey)) {
+    // Validate API key if provided (optional since backend has API_KEY_REQUIRED=false)
+    if (finalConfig.apiKey && !validateApiKey(finalConfig.apiKey)) {
       throw new ValidationError('Invalid API key format. API key should start with "sk_" and be at least 20 characters long.');
     }
 
@@ -88,12 +88,13 @@ export class AISpine {
     options: RequestOptions = {}
   ): Promise<ExecutionResponse> {
     // Validate inputs
-    const errors = [];
+    const errors: ValidationErrorType[] = [];
     
     if (!validateFlowId(flowId)) {
       errors.push({
         field: 'flowId',
         message: 'Invalid flow ID format',
+        code: 'invalid_value',
         value: flowId,
       });
     }
@@ -106,7 +107,7 @@ export class AISpine {
     
     const request: FlowExecutionRequest = {
       flow_id: flowId,
-      input: sanitizedInput,
+      input_data: sanitizedInput,
     };
 
     const response = await this.client.post<ExecutionResponse>('/flows/execute', request, options);
@@ -434,7 +435,7 @@ export class AISpine {
   /**
    * Get current SDK configuration
    */
-  public getConfig(): Required<AISpineConfig> {
+  public getConfig(): Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string } {
     return this.client.getConfig();
   }
 
@@ -674,7 +675,7 @@ export class AISpine {
       if (error instanceof AISpineError) {
         throw error;
       }
-      throw new AISpineError('Environment validation failed', 'validation_error', error);
+      throw new AISpineError('Environment validation failed', 'validation_error', undefined, { error });
     }
   }
 
@@ -706,7 +707,7 @@ export class AISpine {
       if (error instanceof AISpineError) {
         throw error;
       }
-      throw new AISpineError('Failed to get agent environment schema', 'api_error', error);
+      throw new AISpineError('Failed to get agent environment schema', 'api_error', undefined, { error });
     }
   }
 

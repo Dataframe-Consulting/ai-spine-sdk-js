@@ -4,7 +4,7 @@
  * Custom error classes for different types of failures
  */
 
-import { APIError, ValidationError } from './types';
+import { APIError, ValidationError as ValidationErrorType } from './types';
 
 export class AISpineError extends Error {
   public readonly code: string;
@@ -50,9 +50,9 @@ export class AuthorizationError extends AISpineError {
 }
 
 export class ValidationError extends AISpineError {
-  public readonly validationErrors: ValidationError[];
+  public readonly validationErrors: ValidationErrorType[];
 
-  constructor(message: string, validationErrors: ValidationError[] = [], details?: Record<string, any>) {
+  constructor(message: string, validationErrors: ValidationErrorType[] = [], details?: Record<string, any>) {
     super(message, 'VALIDATION_ERROR', 400, details);
     this.name = 'ValidationError';
     this.validationErrors = validationErrors;

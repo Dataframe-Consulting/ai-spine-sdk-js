@@ -29,10 +29,13 @@ describe('AISpine', () => {
       }).toThrow(ValidationError);
     });
 
-    it('should throw ValidationError for missing API key', () => {
+    it('should allow optional API key', () => {
       expect(() => {
         new AISpine('');
-      }).toThrow(ValidationError);
+      }).not.toThrow();
+      
+      const spine = new AISpine({});
+      expect(spine).toBeInstanceOf(AISpine);
     });
   });
 
@@ -46,7 +49,7 @@ describe('AISpine', () => {
     it('should get current configuration', () => {
       const config = spine.getConfig();
       expect(config.apiKey).toBe(validApiKey);
-      expect(config.baseURL).toBe('http://localhost:8000/api/v1');
+      expect(config.baseURL).toBe('https://ai-spine-api-production.up.railway.app');
       expect(config.timeout).toBe(30000);
       expect(config.retries).toBe(3);
       expect(config.debug).toBe(false);

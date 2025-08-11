@@ -237,6 +237,7 @@ describe('WebhookEventFactory', () => {
   const testData = {
     execution: {
       execution_id: 'exec_123',
+      flow_id: 'flow_test',
       status: 'completed' as const,
       input_data: {},
       output_data: { result: 'success' },
@@ -291,7 +292,14 @@ describe('WebhookEventFactory', () => {
   it('should create custom events', () => {
     const customEvent = WebhookEventFactory.createCustomEvent(
       'flow.created',
-      { flow: { flow_id: 'flow_123' } },
+      { 
+        flow: { 
+          flow_id: 'flow_123',
+          name: 'Test Flow',
+          description: 'Test flow description',
+          nodes: []
+        } 
+      },
       'wh_123'
     );
     
