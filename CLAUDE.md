@@ -47,7 +47,29 @@ El proyecto tiene configurado un workflow de GitHub Actions (`.github/workflows/
 
 ### Cómo publicar una nueva versión
 
-1. **Actualizar la versión en package.json** siguiendo Semantic Versioning:
+1. **ACTUALIZAR CHANGELOG.md** - ⚠️ IMPORTANTE:
+   - **Debe estar en INGLÉS** (es un proyecto open source internacional)
+   - Seguir el formato [Keep a Changelog](https://keepachangelog.com)
+   ```markdown
+   ## [Unreleased]
+   <!-- Pending changes not yet released -->
+
+   ## [2.3.0] - 2024-01-20  <!-- New version to publish -->
+   
+   ### Added
+   - New feature description in English
+   
+   ### Changed
+   - Modified behavior description
+   
+   ### Fixed
+   - Bug fixes description
+   
+   ### Breaking Changes  <!-- Only if applicable -->
+   - Breaking compatibility changes
+   ```
+
+2. **Actualizar la versión en package.json** siguiendo Semantic Versioning:
    ```bash
    # Para cambios que rompen compatibilidad (MAJOR: 2.0.0 → 3.0.0)
    npm version major --no-git-tag-version
@@ -59,17 +81,20 @@ El proyecto tiene configurado un workflow de GitHub Actions (`.github/workflows/
    npm version patch --no-git-tag-version
    ```
 
-2. **Commit y push a main**:
+3. **Commit y push a main**:
    ```bash
-   git add package.json
-   git commit -m "chore: bump version to X.Y.Z"
+   git add .
+   git commit -m "chore: release vX.Y.Z"
    git push origin main
    ```
 
-3. **GitHub Actions se encarga del resto**:
+4. **GitHub Actions se encarga del resto**:
    - Ve el progreso en: GitHub → Actions tab
-   - Si todo está bien, la nueva versión se publicará en npm
-   - Se creará automáticamente el tag vX.Y.Z
+   - Publicará en npm automáticamente
+   - Creará un Release en GitHub con la info del CHANGELOG
+   - Creará el tag git vX.Y.Z
+
+**NOTA**: El Release de GitHub extrae automáticamente la información del CHANGELOG.md para la versión correspondiente. Por eso es CRÍTICO actualizar el CHANGELOG antes de publicar.
 
 ### Versionado Semántico (A.B.C)
 
