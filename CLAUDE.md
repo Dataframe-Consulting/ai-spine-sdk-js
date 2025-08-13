@@ -30,6 +30,63 @@ npm run lint:fix
 npm run typecheck
 ```
 
+## Publishing to NPM
+
+### Automated Deploy with GitHub Actions
+
+El proyecto tiene configurado un workflow de GitHub Actions (`.github/workflows/npm-publish.yml`) que:
+
+1. **Se ejecuta automáticamente** en cada push a la rama `main`
+2. **Verifica si la versión cambió** comparando con npm registry
+3. **Si la versión es nueva**:
+   - Ejecuta tests
+   - Construye el proyecto
+   - Publica a npm automáticamente
+   - Crea un tag git (ej: v2.2.0)
+4. **Si la versión ya existe**: No hace nada (evita publicaciones duplicadas)
+
+### Cómo publicar una nueva versión
+
+1. **Actualizar la versión en package.json** siguiendo Semantic Versioning:
+   ```bash
+   # Para cambios que rompen compatibilidad (MAJOR: 2.0.0 → 3.0.0)
+   npm version major --no-git-tag-version
+   
+   # Para nuevas funcionalidades compatibles (MINOR: 2.1.0 → 2.2.0)  
+   npm version minor --no-git-tag-version
+   
+   # Para corrección de bugs (PATCH: 2.1.1 → 2.1.2)
+   npm version patch --no-git-tag-version
+   ```
+
+2. **Commit y push a main**:
+   ```bash
+   git add package.json
+   git commit -m "chore: bump version to X.Y.Z"
+   git push origin main
+   ```
+
+3. **GitHub Actions se encarga del resto**:
+   - Ve el progreso en: GitHub → Actions tab
+   - Si todo está bien, la nueva versión se publicará en npm
+   - Se creará automáticamente el tag vX.Y.Z
+
+### Versionado Semántico (A.B.C)
+
+- **A (MAJOR)**: Cambios incompatibles con versiones anteriores
+  - Ejemplo: API key pasa de opcional a obligatorio
+  - Ejemplo: Se elimina un método público
+  
+- **B (MINOR)**: Nuevas funcionalidades compatibles hacia atrás
+  - Ejemplo: Se añade método `checkCredits()`
+  - Ejemplo: Se añade parámetro opcional
+  
+- **C (PATCH)**: Corrección de bugs sin cambios en la API
+  - Ejemplo: Fix en validación de webhooks
+  - Ejemplo: Corrección de timeout
+
+**IMPORTANTE**: Si hay dudas sobre qué versión usar, pregúntame antes de actualizar.
+
 ## Architecture Overview
 
 This is the AI Spine JavaScript SDK - a TypeScript SDK for orchestrating AI agents and workflows, positioned as "The Stripe for AI Agent Orchestration".
@@ -81,7 +138,8 @@ The SDK communicates with the AI Spine API at `https://ai-spine-api-production.u
 
 **Current Status:**
 - API is live at Railway but no real agents are connected yet
-- Authentication is currently disabled (API_KEY_REQUIRED=false)
+- Authentication is NOW REQUIRED (API key must start with 'sk_')
+- New user management features: `getCurrentUser()` and `checkCredits()`
 - Webhooks are NOT implemented - use polling with `waitForExecution()`
 - Only HTTP/HTTPS protocols are supported for agent endpoints
 
