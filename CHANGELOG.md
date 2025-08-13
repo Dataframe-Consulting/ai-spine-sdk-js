@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [2.2.1] - 2024-01-13
+
+### Added
+- Automated GitHub Release creation from CHANGELOG.md
+- CHANGELOG.md for better version tracking
+
+### Fixed
+- GitHub Actions workflow permissions for creating tags
+
+### Changed
+- Workflow now extracts release notes from CHANGELOG.md
+
 ## [2.2.0] - 2024-01-13
 
 ### Added
