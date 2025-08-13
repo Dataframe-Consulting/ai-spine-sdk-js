@@ -8,6 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Permite escribir tags y commits
+      packages: write  # Permite publicar paquetes
     steps:
       - uses: actions/checkout@v4
         with:
