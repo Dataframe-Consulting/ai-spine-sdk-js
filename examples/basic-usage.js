@@ -4,27 +4,43 @@
  * This example demonstrates the core functionality of the AI Spine SDK
  */
 
-const { AISpine } = require('@ai-spine/sdk');
+const { AISpine, InsufficientCreditsError, RateLimitError } = require('@ai-spine/sdk');
 
 async function main() {
-  // Initialize the SDK
+  // Initialize the SDK with API key (required)
   const spine = new AISpine({
     apiKey: process.env.AI_SPINE_API_KEY || 'sk_test_your_api_key_here',
-    // baseURL: 'https://ai-spine-api-production.up.railway.app/api/v1', // Default production API
+    // baseURL: 'https://ai-spine-api-production.up.railway.app', // Default production API
     debug: true, // Enable debug logging
+    onCreditsLow: (credits) => {
+      console.warn(`⚠️  Low credits warning: ${credits} remaining`);
+    }
   });
 
   try {
     console.log('🚀 AI Spine SDK Basic Usage Example\n');
 
-    // 1. Check system health
-    console.log('1. Checking system health...');
+    // 1. Check user info and credits
+    console.log('1. Checking user info and credits...');
+    const user = await spine.getCurrentUser();
+    console.log(`   User: ${user.email}`);
+    console.log(`   Plan: ${user.plan}`);
+    console.log(`   Credits remaining: ${user.credits}`);
+    
+    const credits = await spine.checkCredits();
+    if (credits < 100) {
+      console.warn(`   ⚠️  Low credits! Please top up at https://ai-spine.com/billing`);
+    }
+    console.log();
+
+    // 2. Check system health
+    console.log('2. Checking system health...');
     const health = await spine.healthCheck();
     console.log(`   Status: ${health.status}`);
     console.log(`   Version: ${health.version || 'unknown'}\n`);
 
-    // 2. List available flows
-    console.log('2. Listing available flows...');
+    // 3. List available flows
+    console.log('3. Listing available flows...');
     const flows = await spine.listFlows();
     console.log(`   Found ${flows.length} flows:`);
     flows.forEach(flow => {
@@ -33,8 +49,8 @@ async function main() {
     });
     console.log();
 
-    // 3. List registered agents
-    console.log('3. Listing registered agents...');
+    // 4. List registered agents
+    console.log('4. Listing registered agents...');
     const agents = await spine.listAgents();
     console.log(`   Found ${agents.length} agents:`);
     agents.forEach(agent => {
@@ -44,10 +60,10 @@ async function main() {
     });
     console.log();
 
-    // 4. Execute a flow (if available)
+    // 5. Execute a flow (if available)
     if (flows.length > 0) {
       const flowToExecute = flows[0]; // Use the first available flow
-      console.log(`4. Executing flow: ${flowToExecute.name}`);
+      console.log(`5. Executing flow: ${flowToExecute.name}`);
       
       const executionRequest = {
         user_query: 'Hello, I need help with my account'
@@ -59,8 +75,8 @@ async function main() {
       console.log(`   Execution started: ${execution.execution_id}`);
       console.log(`   Status: ${execution.status}`);
 
-      // 5. Wait for completion
-      console.log('\n5. Waiting for execution to complete...');
+      // 6. Wait for completion
+      console.log('\n6. Waiting for execution to complete...');
       const result = await spine.waitForExecution(execution.execution_id, {
         timeout: 60000, // 1 minute timeout
         interval: 2000,  // Check every 2 seconds
@@ -82,8 +98,8 @@ async function main() {
         console.log('   Error:', result.error_message);
       }
 
-      // 6. Show node execution details
-      console.log('\n6. Node execution details:');
+      // 7. Show node execution details
+      console.log('\n7. Node execution details:');
       Object.entries(result.node_results).forEach(([nodeId, nodeResult]) => {
         console.log(`   Node: ${nodeId}`);
         console.log(`   - Status: ${nodeResult.status}`);
@@ -93,11 +109,11 @@ async function main() {
         }
       });
     } else {
-      console.log('4. No flows available for execution');
+      console.log('5. No flows available for execution');
     }
 
-    // 7. Get system metrics
-    console.log('\n7. Getting system metrics...');
+    // 8. Get system metrics
+    console.log('\n8. Getting system metrics...');
     const metrics = await spine.getMetrics();
     console.log(`   Total executions: ${metrics.total_executions}`);
     console.log(`   Successful: ${metrics.successful_executions}`);
@@ -113,16 +129,29 @@ async function main() {
   } catch (error) {
     console.error('\n❌ Error occurred:', error.message);
     
-    if (error.code) {
-      console.error('   Error code:', error.code);
-    }
-    
-    if (error.status) {
-      console.error('   HTTP status:', error.status);
-    }
-    
-    if (error.details) {
-      console.error('   Details:', JSON.stringify(error.details, null, 2));
+    // Handle specific error types
+    if (error instanceof InsufficientCreditsError) {
+      console.error('   No credits remaining! Top up at https://ai-spine.com/billing');
+      if (error.creditsNeeded) {
+        console.error(`   Credits needed: ${error.creditsNeeded}`);
+      }
+    } else if (error instanceof RateLimitError) {
+      console.error('   Rate limit exceeded. Please wait before retrying.');
+      if (error.retryAfter) {
+        console.error(`   Retry after: ${error.retryAfter} seconds`);
+      }
+    } else {
+      if (error.code) {
+        console.error('   Error code:', error.code);
+      }
+      
+      if (error.status) {
+        console.error('   HTTP status:', error.status);
+      }
+      
+      if (error.details) {
+        console.error('   Details:', JSON.stringify(error.details, null, 2));
+      }
     }
     
     process.exit(1);
