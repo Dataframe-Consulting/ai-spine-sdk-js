@@ -62,3 +62,48 @@ jobs:
           git config user.email github-actions@github.com
           git tag -a v${{ steps.version.outputs.current }} -m "Release v${{ steps.version.outputs.current }}"
           git push origin v${{ steps.version.outputs.current }}
+      
+      - name: Extract changelog for version
+        if: steps.version.outputs.changed == 'true'
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.current }}
+          # Extraer la sección del CHANGELOG para esta versión
+          CHANGELOG_CONTENT=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' | tail -n +2)
+          
+          # Si no encuentra contenido, usar un mensaje genérico
+          if [ -z "$CHANGELOG_CONTENT" ]; then
+            CHANGELOG_CONTENT="- New version released
+          - Check CHANGELOG.md for details"
+          fi
+          
+          # Guardar en variable de GitHub
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        if: steps.version.outputs.changed == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.current }}
+          release_name: v${{ steps.version.outputs.current }}
+          body: |
+            ## 🚀 Version ${{ steps.version.outputs.current }}
+            
+            ${{ steps.changelog.outputs.content }}
+            
+            ---
+            
+            ### 📦 Installation
+            ```bash
+            npm install ai-spine-sdk@${{ steps.version.outputs.current }}
+            ```
+            
+            ### 📚 Links
+            - [View on npm](https://www.npmjs.com/package/ai-spine-sdk/v/${{ steps.version.outputs.current }})
+            - [Full Changelog](https://github.com/Dataframe-Consulting/ai-spine-sdk-js/blob/main/CHANGELOG.md)
+          draft: false
+          prerelease: false
