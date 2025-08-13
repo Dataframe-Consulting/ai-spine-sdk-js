@@ -73,12 +73,21 @@ export class WebhookSignature {
         .digest('hex');
 
       // Compare signatures using constant-time comparison
-      const isValid = signatures.some(signature => 
-        crypto.timingSafeEqual(
-          Buffer.from(signature, 'hex'),
-          Buffer.from(expectedSignature, 'hex')
-        )
-      );
+      const isValid = signatures.some(signature => {
+        try {
+          // Ensure both signatures are valid hex strings of the same length
+          if (signature.length !== expectedSignature.length) {
+            return false;
+          }
+          return crypto.timingSafeEqual(
+            Buffer.from(signature, 'hex'),
+            Buffer.from(expectedSignature, 'hex')
+          );
+        } catch {
+          // Invalid hex string
+          return false;
+        }
+      });
 
       return { valid: isValid };
     } catch (error) {

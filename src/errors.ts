@@ -49,6 +49,23 @@ export class AuthorizationError extends AISpineError {
   }
 }
 
+export class InsufficientCreditsError extends AISpineError {
+  public readonly creditsNeeded?: number;
+  public readonly creditsAvailable?: number;
+
+  constructor(
+    message: string = 'No credits remaining. Top up at https://ai-spine.com/billing',
+    creditsNeeded?: number,
+    creditsAvailable?: number,
+    details?: Record<string, any>
+  ) {
+    super(message, 'INSUFFICIENT_CREDITS', 403, details);
+    this.name = 'InsufficientCreditsError';
+    this.creditsNeeded = creditsNeeded;
+    this.creditsAvailable = creditsAvailable;
+  }
+}
+
 export class ValidationError extends AISpineError {
   public readonly validationErrors: ValidationErrorType[];
 
@@ -145,6 +162,14 @@ export function createErrorFromResponse(
     case 401:
       return new AuthenticationError(errorMessage, details);
     case 403:
+      if (data?.error_code === 'INSUFFICIENT_CREDITS') {
+        return new InsufficientCreditsError(
+          errorMessage,
+          data?.credits_needed,
+          data?.credits_available,
+          details
+        );
+      }
       return new AuthorizationError(errorMessage, details);
     case 404:
       return new NotFoundError(errorMessage);

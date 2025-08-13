@@ -14,7 +14,7 @@ import { WebhookEvent, WebhookEventType } from '../types';
 describe('WebhookSignature', () => {
   const secret = 'whsec_test_secret_key_12345';
   const payload = JSON.stringify({ test: 'data' });
-  const timestamp = '1234567890';
+  const timestamp = Math.floor(Date.now() / 1000).toString();
 
   describe('generate', () => {
     it('should generate a valid signature', () => {

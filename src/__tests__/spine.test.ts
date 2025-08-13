@@ -23,19 +23,21 @@ describe('AISpine', () => {
       expect(spine).toBeInstanceOf(AISpine);
     });
 
-    it('should throw ValidationError for invalid API key', () => {
-      expect(() => {
-        new AISpine('invalid-key');
-      }).toThrow(ValidationError);
-    });
-
-    it('should allow optional API key', () => {
+    it('should throw Error for missing API key', () => {
       expect(() => {
         new AISpine('');
-      }).not.toThrow();
+      }).toThrow('API key is required');
       
-      const spine = new AISpine({});
-      expect(spine).toBeInstanceOf(AISpine);
+      expect(() => {
+        new AISpine({} as any);
+      }).toThrow('API key is required');
+    });
+
+    it('should warn for invalid API key format', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      new AISpine('invalid-key-format');
+      expect(warnSpy).toHaveBeenCalledWith('API key should start with "sk_". Make sure you\'re using a valid user key.');
+      warnSpy.mockRestore();
     });
   });
 
