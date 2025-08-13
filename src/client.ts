@@ -8,7 +8,8 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } f
 import { 
   AISpineConfig, 
   RequestOptions, 
-  SDKResponse 
+  SDKResponse,
+  UserInfo
 } from './types';
 import { 
   createErrorFromResponse, 
@@ -19,20 +20,32 @@ import {
 
 export class AISpineClient {
   private readonly http: AxiosInstance;
-  private readonly config: Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string };
+  private readonly config: Required<AISpineConfig>;
 
-  constructor(config: AISpineConfig) {
+  constructor(config: AISpineConfig | string) {
+    // Backward compatibility
+    if (typeof config === 'string') {
+      config = { apiKey: config };
+    }
+
+    // Validate API key
+    if (!config.apiKey) {
+      throw new Error('API key is required. Get yours at https://ai-spine.com/dashboard');
+    }
+
+    if (!config.apiKey.startsWith('sk_')) {
+      console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
+    }
+
     // Set defaults
     this.config = {
-      baseURL: 'https://ai-spine-api-production.up.railway.app',
-      timeout: 30000,
-      retries: 3,
-      debug: false,
-      ...config,
-    };
-
-    // API key is optional since backend has API_KEY_REQUIRED=false
-    // But we'll still send it if provided
+      apiKey: config.apiKey,
+      baseURL: config.baseURL || 'https://ai-spine-api-production.up.railway.app',
+      timeout: config.timeout || 30000,
+      retries: config.retries || 3,
+      debug: config.debug || false,
+      onCreditsLow: config.onCreditsLow || (() => {})
+    }
 
     // Create axios instance
     this.http = axios.create({
@@ -41,7 +54,7 @@ export class AISpineClient {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
+        'Authorization': `Bearer ${this.config.apiKey}`,
         'User-Agent': '@ai-spine/sdk-js/2.1.0',
       },
     });
@@ -231,9 +244,27 @@ export class AISpineClient {
     );
   }
 
+  // User Management Methods
+
+  public async getCurrentUser(): Promise<UserInfo> {
+    const response = await this.get<UserInfo>('/api/v1/users/me');
+    
+    // Check if credits are low and trigger callback
+    if (this.config.onCreditsLow && response.data.credits < 100) {
+      this.config.onCreditsLow(response.data.credits);
+    }
+    
+    return response.data;
+  }
+
+  public async checkCredits(): Promise<number> {
+    const user = await this.getCurrentUser();
+    return user.credits;
+  }
+
   // Utility Methods
 
-  public getConfig(): Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string } {
+  public getConfig(): Required<AISpineConfig> {
     return { ...this.config };
   }
 

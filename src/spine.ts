@@ -29,6 +29,7 @@ import {
   ValidationError as ValidationErrorType,
   AgentExecutionRequest,
   AgentExecutionResponse,
+  UserInfo,
 } from './types';
 import {
   validateApiKey,
@@ -50,14 +51,19 @@ export class AISpine {
   private readonly webhookHandler: WebhookEventHandler;
 
   constructor(config: string | AISpineConfig) {
-    // Allow string API key as shorthand
+    // Allow string API key as shorthand for backward compatibility
     const finalConfig: AISpineConfig = typeof config === 'string' 
       ? { apiKey: config }
       : config;
 
-    // Validate API key if provided (optional since backend has API_KEY_REQUIRED=false)
-    if (finalConfig.apiKey && !validateApiKey(finalConfig.apiKey)) {
-      throw new ValidationError('Invalid API key format. API key should start with "sk_" and be at least 20 characters long.');
+    // API key is now required
+    if (!finalConfig.apiKey) {
+      throw new ValidationError('API key is required. Get yours at https://ai-spine.com/dashboard');
+    }
+
+    // Validate API key format
+    if (!finalConfig.apiKey.startsWith('sk_')) {
+      console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
     }
 
     this.client = new AISpineClient(finalConfig);
@@ -815,5 +821,42 @@ export class AISpine {
    */
   public getWebhookHandler(): WebhookEventHandler {
     return this.webhookHandler;
+  }
+
+  // User Management Methods
+
+  /**
+   * Get the current authenticated user information
+   * 
+   * @param options - Request options
+   * @returns Promise resolving to user information
+   * 
+   * @example
+   * ```typescript
+   * const user = await spine.getCurrentUser();
+   * console.log('User email:', user.email);
+   * console.log('Credits remaining:', user.credits);
+   * ```
+   */
+  public async getCurrentUser(options: RequestOptions = {}): Promise<UserInfo> {
+    return this.client.getCurrentUser();
+  }
+
+  /**
+   * Check remaining credits for the current user
+   * 
+   * @param options - Request options
+   * @returns Promise resolving to the number of credits remaining
+   * 
+   * @example
+   * ```typescript
+   * const credits = await spine.checkCredits();
+   * if (credits < 100) {
+   *   console.warn('Low credits! Please top up at https://ai-spine.com/billing');
+   * }
+   * ```
+   */
+  public async checkCredits(options: RequestOptions = {}): Promise<number> {
+    return this.client.checkCredits();
   }
 }

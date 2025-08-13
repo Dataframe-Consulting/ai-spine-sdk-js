@@ -29,6 +29,10 @@ export type {
   AISpineConfig,
   RequestOptions,
   
+  // User management
+  UserInfo,
+  APIKeyInfo,
+  
   // Core entities
   Agent,
   AgentConfig,
@@ -84,6 +88,7 @@ export {
   AISpineError,
   AuthenticationError,
   AuthorizationError,
+  InsufficientCreditsError,
   ValidationError,
   NotFoundError,
   RateLimitError,

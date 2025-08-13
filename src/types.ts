@@ -6,8 +6,8 @@
 
 // Configuration Types
 export interface AISpineConfig {
-  /** API key for authentication (optional - backend has API_KEY_REQUIRED=false) */
-  apiKey?: string;
+  /** API key for authentication (required - get from https://ai-spine.com/dashboard) */
+  apiKey: string;
   /** Base URL for the AI Spine API */
   baseURL?: string;
   /** Request timeout in milliseconds */
@@ -16,6 +16,29 @@ export interface AISpineConfig {
   retries?: number;
   /** Enable debug logging */
   debug?: boolean;
+  /** Callback when credits are low */
+  onCreditsLow?: (credits: number) => void;
+}
+
+// User Account Types
+export interface UserInfo {
+  id: string;
+  email: string;
+  name?: string;
+  credits: number;
+  plan: 'free' | 'starter' | 'professional' | 'enterprise';
+  created_at: string;
+  updated_at: string;
+  api_keys?: APIKeyInfo[];
+}
+
+export interface APIKeyInfo {
+  id: string;
+  key: string;
+  name?: string;
+  created_at: string;
+  last_used?: string;
+  active: boolean;
 }
 
 // Environment Variable Types
