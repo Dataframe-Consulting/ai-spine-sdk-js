@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [2.5.3] - 2025-01-15
+
+### Fixed
+- **CRITICAL**: Fixed agent_type validation error causing 500 response
+- Changed default agent_type from 'custom' to 'processor' 
+- agent_type now only accepts: 'input', 'processor', 'output', 'conditional'
+- Removed invalid 'custom' option that was causing server errors
+
 ## [2.5.2] - 2025-01-15
 
 ### Fixed
