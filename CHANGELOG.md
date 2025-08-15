@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [2.4.2] - 2025-01-14
+
+### Fixed
+- Fixed TypeScript type definitions not being generated correctly in build
+- Fixed `supabaseToken` property not being recognized in TypeScript
+- Simplified config type definitions to properly support optional supabaseToken
+
 ## [2.4.1] - 2025-01-14
 
 ### Fixed
