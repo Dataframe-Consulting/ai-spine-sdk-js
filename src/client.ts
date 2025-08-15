@@ -43,7 +43,7 @@ export class AISpineClient {
     // Set defaults
     this.config = {
       apiKey: config.apiKey,
-      baseURL: config.baseURL || 'https://ai-spine-api-production.up.railway.app',
+      baseURL: config.baseURL || 'https://ai-spine-api.up.railway.app',
       timeout: config.timeout || 30000,
       retries: config.retries || 3,
       debug: config.debug || false,

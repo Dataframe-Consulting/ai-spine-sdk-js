@@ -47,7 +47,7 @@ describe('API Key Management', () => {
       const result = await spine.checkUserApiKey(userId);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://ai-spine-api-production.up.railway.app/api/v1/user/keys/my-key',
+        'https://ai-spine-api.up.railway.app/api/v1/user/keys/my-key',
         {
           params: { user_id: userId },
           timeout: 30000,
@@ -104,7 +104,7 @@ describe('API Key Management', () => {
       const result = await spine.generateUserApiKey(userId);
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        'https://ai-spine-api-production.up.railway.app/api/v1/user/keys/generate',
+        'https://ai-spine-api.up.railway.app/api/v1/user/keys/generate',
         { user_id: userId },
         {
           timeout: 30000,
@@ -160,7 +160,7 @@ describe('API Key Management', () => {
       const result = await spine.revokeUserApiKey(userId);
 
       expect(mockedAxios.delete).toHaveBeenCalledWith(
-        'https://ai-spine-api-production.up.railway.app/api/v1/user/keys/revoke',
+        'https://ai-spine-api.up.railway.app/api/v1/user/keys/revoke',
         {
           data: { user_id: userId },
           timeout: 30000,

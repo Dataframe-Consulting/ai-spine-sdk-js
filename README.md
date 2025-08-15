@@ -45,7 +45,7 @@ console.log('Final result:', execution.output_data);
 
 ### ⚠️ Important notes
 
-- **API Status**: The API is currently running at `https://ai-spine-api-production.up.railway.app`
+- **API Status**: The API is currently running at `https://ai-spine-api.up.railway.app`
 - **Authentication**: API keys are currently optional (`API_KEY_REQUIRED=false`)
 - **Agents**: No real agents are connected yet - flows will fail until agents are registered
 - **Webhooks**: Not implemented - use polling with `waitForExecution()` instead
@@ -59,7 +59,7 @@ import { AISpine } from 'ai-spine-sdk';
 
 const spine = new AISpine({
   apiKey: 'sk_test_your_api_key_here', // Optional - currently API_KEY_REQUIRED=false
-  // baseURL defaults to: https://ai-spine-api-production.up.railway.app
+  // baseURL defaults to: https://ai-spine-api.up.railway.app
   // baseURL: 'https://your-custom-api.com', // Optional: Custom API URL
   timeout: 30000, // 30 second timeout
   retries: 3, // Retry failed requests 3 times
@@ -384,7 +384,7 @@ import { AISpine } from 'ai-spine-sdk';
 // Initialize without API key for key management operations
 const spine = new AISpine({
   apiKey: 'sk_dummy', // These endpoints don't use the API key
-  baseURL: 'https://ai-spine-api-production.up.railway.app'
+  baseURL: 'https://ai-spine-api.up.railway.app'
 });
 
 async function manageUserApiKey(userId: string) {
