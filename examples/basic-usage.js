@@ -10,7 +10,7 @@ async function main() {
   // Initialize the SDK with API key (required)
   const spine = new AISpine({
     apiKey: process.env.AI_SPINE_API_KEY || 'sk_test_your_api_key_here',
-    // baseURL: 'https://ai-spine-api-production.up.railway.app', // Default production API
+    // baseURL: 'https://ai-spine-api.up.railway.app', // Default production API
     debug: true, // Enable debug logging
     onCreditsLow: (credits) => {
       console.warn(`⚠️  Low credits warning: ${credits} remaining`);

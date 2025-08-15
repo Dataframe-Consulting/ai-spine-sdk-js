@@ -843,6 +843,68 @@ export class AISpine {
   }
 
   /**
+   * Check if a user has an API key generated
+   * 
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns Promise resolving to API key status and details
+   * 
+   * @example
+   * ```typescript
+   * const userId = '123e4567-e89b-12d3-a456-426614174000';
+   * const status = await spine.checkUserApiKey(userId);
+   * 
+   * if (!status.has_api_key) {
+   *   console.log('User does not have an API key');
+   * } else {
+   *   console.log('API Key:', status.api_key);
+   *   console.log('Credits:', status.credits);
+   * }
+   * ```
+   */
+  public async checkUserApiKey(userId: string) {
+    return this.client.checkUserApiKey(userId);
+  }
+
+  /**
+   * Generate or regenerate an API key for a user
+   * 
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns Promise resolving to new API key and action taken
+   * 
+   * @example
+   * ```typescript
+   * const userId = '123e4567-e89b-12d3-a456-426614174000';
+   * const result = await spine.generateUserApiKey(userId);
+   * 
+   * console.log('Action:', result.action); // 'created' or 'regenerated'
+   * console.log('New API Key:', result.api_key);
+   * console.log('Message:', result.message);
+   * ```
+   */
+  public async generateUserApiKey(userId: string) {
+    return this.client.generateUserApiKey(userId);
+  }
+
+  /**
+   * Revoke (delete) a user's API key
+   * 
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns Promise resolving to confirmation of revocation
+   * 
+   * @example
+   * ```typescript
+   * const userId = '123e4567-e89b-12d3-a456-426614174000';
+   * const result = await spine.revokeUserApiKey(userId);
+   * 
+   * console.log('Status:', result.status); // 'revoked'
+   * console.log('Message:', result.message);
+   * ```
+   */
+  public async revokeUserApiKey(userId: string) {
+    return this.client.revokeUserApiKey(userId);
+  }
+
+  /**
    * Check remaining credits for the current user
    * 
    * @param options - Request options

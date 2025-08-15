@@ -153,7 +153,7 @@ Tests are located in `src/__tests__/` and use Jest with a setup file for common 
 
 ### API Integration
 
-The SDK communicates with the AI Spine API at `https://ai-spine-api-production.up.railway.app` by default. All requests include:
+The SDK communicates with the AI Spine API at `https://ai-spine-api.up.railway.app` by default. All requests include:
 - Authentication via `Authorization: Bearer {apiKey}` header (optional - API_KEY_REQUIRED=false)
 - Content-Type and Accept headers set to `application/json`
 - Automatic retry logic with exponential backoff
