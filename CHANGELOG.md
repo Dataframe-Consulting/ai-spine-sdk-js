@@ -2,6 +2,38 @@
 
 ## [Unreleased]
 
+## [2.4.0] - 2025-01-14
+
+### Added
+- **Dual Authentication System**: Support for both API key and Supabase token authentication
+- New secure user account methods using Supabase authentication:
+  - `getUserProfile()` - Get user profile information
+  - `getUserApiKeyStatus()` - Get API key status with masked key
+  - `generateApiKey()` - Generate or regenerate API key
+  - `revokeApiKey()` - Revoke user's API key
+- New TypeScript types for secure endpoints:
+  - `UserProfile` - User profile data
+  - `UserApiKeyStatus` - Secure API key status response
+  - `UserApiKeyGenerateResponse` - Secure key generation response
+- `supabaseToken` configuration option for authenticated requests
+
+### Changed
+- Clear separation between authentication methods:
+  - Supabase token for user account management (`/api/v1/user/account/*`)
+  - API key for API operations (`/api/v1/flows/*`, `/api/v1/agents/*`)
+- Improved initialization warnings for missing credentials
+
+### Deprecated
+- Old user key management methods (still functional but will be removed in v3.0.0):
+  - `checkUserApiKey(userId)` - Use `getUserApiKeyStatus()` instead
+  - `generateUserApiKey(userId)` - Use `generateApiKey()` instead
+  - `revokeUserApiKey(userId)` - Use `revokeApiKey()` instead
+
+### Security
+- User account endpoints now require proper Supabase authentication
+- API keys are masked in status responses for security
+- No more passing user IDs as parameters (extracted from token)
+
 ## [2.3.1] - 2025-01-14
 
 ### Fixed

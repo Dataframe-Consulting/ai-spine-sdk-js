@@ -1,6 +1,6 @@
 {
   "name": "ai-spine-sdk",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Official JavaScript SDK for AI Spine - The Stripe for AI Agent Orchestration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

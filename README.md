@@ -328,103 +328,163 @@ const flow = await spine.createFlow({
 - **`boolean`**: True/false values
 - **`password`**: Sensitive fields (API keys, secrets) - handled as strings but marked as sensitive for UI
 
-## 🔑 API Key Management
+## 🔑 API Key Management (v2.4.0+)
 
-The SDK provides methods to manage user API keys programmatically. These methods **do not require authentication** and are designed to be used from your backend to manage API keys for your users.
+The SDK now supports **dual authentication** for enhanced security:
+- **Supabase Token**: For user account management (profile, API keys)
+- **API Key**: For API operations (flows, agents, executions)
 
-### Check if user has API key
+### Secure User Account Methods (NEW - Recommended)
 
-```typescript
-const userId = '123e4567-e89b-12d3-a456-426614174000'; // Supabase Auth user ID
-const status = await spine.checkUserApiKey(userId);
-
-if (!status.has_api_key) {
-  console.log('User does not have an API key');
-} else {
-  console.log('API Key:', status.api_key);
-  console.log('Credits:', status.credits);
-  console.log('Rate limit:', status.rate_limit);
-  console.log('Created at:', status.created_at);
-  console.log('Last used:', status.last_used_at);
-}
-```
-
-### Generate or regenerate API key
-
-```typescript
-const userId = '123e4567-e89b-12d3-a456-426614174000';
-
-// This will create a new key if none exists, or regenerate if one already exists
-const result = await spine.generateUserApiKey(userId);
-
-console.log('Action:', result.action); // 'created' or 'regenerated'
-console.log('New API Key:', result.api_key);
-console.log('Message:', result.message);
-
-// Save this key securely - it won't be shown again!
-```
-
-### Revoke API key
-
-```typescript
-const userId = '123e4567-e89b-12d3-a456-426614174000';
-
-// Permanently delete the user's API key
-const result = await spine.revokeUserApiKey(userId);
-
-console.log('Status:', result.status); // 'revoked'
-console.log('Message:', result.message);
-```
-
-### Complete workflow example
+These methods use Supabase authentication for enhanced security:
 
 ```typescript
 import { AISpine } from 'ai-spine-sdk';
+import { createClient } from '@supabase/supabase-js';
 
-// Initialize without API key for key management operations
+// Get Supabase session
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const { data: { session } } = await supabase.auth.getSession();
+
+// Initialize SDK with Supabase token
 const spine = new AISpine({
-  // apiKey is optional - user management methods don't require authentication
+  supabaseToken: session.access_token,  // For user account methods
+  apiKey: savedApiKey,  // For API operations (when available)
   baseURL: 'https://ai-spine-api.up.railway.app'
 });
 
-async function manageUserApiKey(userId: string) {
-  // 1. Check if user has an API key
-  const status = await spine.checkUserApiKey(userId);
-  
-  if (!status.has_api_key) {
-    // 2. Generate first API key
-    const generated = await spine.generateUserApiKey(userId);
-    console.log('Created new API key:', generated.api_key);
-    
-    // Store this key securely in your database
-    await saveApiKeyToDatabase(userId, generated.api_key);
-    
-    return generated.api_key;
-  }
-  
-  // User already has a key
-  return status.api_key;
+// Get user profile
+const profile = await spine.getUserProfile();
+console.log('User:', profile.email);
+
+// Check API key status (returns masked key)
+const status = await spine.getUserApiKeyStatus();
+if (!status.has_api_key) {
+  console.log('No API key exists');
+} else {
+  console.log('Masked key:', status.api_key_masked); // sk_...abc
+  console.log('Credits:', status.credits);
+  console.log('Rate limit:', status.rate_limit);
 }
 
-async function regenerateCompromisedKey(userId: string) {
-  // Regenerate if key is compromised
-  const regenerated = await spine.generateUserApiKey(userId);
-  console.log('New API key:', regenerated.api_key);
-  
-  // Update stored key
-  await updateApiKeyInDatabase(userId, regenerated.api_key);
-  
-  return regenerated.api_key;
-}
+// Generate or regenerate API key
+const result = await spine.generateApiKey();
+console.log('New API key:', result.api_key); // Full key - save securely!
+console.log('Action:', result.action); // 'created' or 'regenerated'
 
-async function removeUserAccess(userId: string) {
-  // Revoke API key when user account is deleted or suspended
-  await spine.revokeUserApiKey(userId);
-  console.log('User API key has been revoked');
+// Revoke API key
+const revokeResult = await spine.revokeApiKey();
+console.log('Revoked:', revokeResult.message);
+```
+
+### Complete Settings Page Implementation
+
+```typescript
+import { AISpine } from 'ai-spine-sdk';
+import { useAuth } from '@/hooks/useAuth'; // Your Supabase auth hook
+
+function SettingsPage() {
+  const { session } = useAuth();
+  const [apiKeyStatus, setApiKeyStatus] = useState(null);
+  const [newApiKey, setNewApiKey] = useState(null);
   
-  // Clean up database
-  await removeApiKeyFromDatabase(userId);
+  // Initialize with dual authentication
+  const spine = useMemo(() => new AISpine({
+    supabaseToken: session?.access_token,  // For user account
+    apiKey: localStorage.getItem('apiKey'),  // For API operations
+    baseURL: 'https://ai-spine-api.up.railway.app'
+  }), [session]);
+  
+  useEffect(() => {
+    checkApiKeyStatus();
+  }, []);
+  
+  const checkApiKeyStatus = async () => {
+    try {
+      const status = await spine.getUserApiKeyStatus();
+      setApiKeyStatus(status);
+    } catch (error) {
+      console.error('Failed to check API key status:', error);
+    }
+  };
+  
+  const generateNewKey = async () => {
+    try {
+      const result = await spine.generateApiKey();
+      setNewApiKey(result.api_key);
+      
+      // Save to secure storage
+      localStorage.setItem('apiKey', result.api_key);
+      
+      // Update status
+      await checkApiKeyStatus();
+      
+      toast.success(`API Key ${result.action}! Copy it now.`);
+    } catch (error) {
+      toast.error('Failed to generate API key');
+    }
+  };
+  
+  const revokeKey = async () => {
+    if (!confirm('This will permanently delete your API key. Continue?')) return;
+    
+    try {
+      await spine.revokeApiKey();
+      localStorage.removeItem('apiKey');
+      setApiKeyStatus({ has_api_key: false });
+      toast.success('API key revoked');
+    } catch (error) {
+      toast.error('Failed to revoke API key');
+    }
+  };
+  
+  return (
+    <div>
+      {newApiKey && (
+        <Alert>
+          <p>⚠️ Save this key - you won't see it again!</p>
+          <code>{newApiKey}</code>
+          <button onClick={() => navigator.clipboard.writeText(newApiKey)}>
+            Copy
+          </button>
+        </Alert>
+      )}
+      
+      {apiKeyStatus?.has_api_key ? (
+        <div>
+          <p>API Key: {apiKeyStatus.api_key_masked}</p>
+          <p>Credits: {apiKeyStatus.credits}</p>
+          <button onClick={generateNewKey}>Regenerate</button>
+          <button onClick={revokeKey}>Revoke</button>
+        </div>
+      ) : (
+        <div>
+          <p>No API key found</p>
+          <button onClick={generateNewKey}>Generate API Key</button>
+        </div>
+      )}
+    </div>
+  );
 }
+```
+
+### Using Both Authentication Methods
+
+```typescript
+// Page that needs both user info and API operations
+const spine = new AISpine({
+  supabaseToken: session.access_token,  // For user account
+  apiKey: savedApiKey,  // For API operations
+  baseURL: 'https://ai-spine-api.up.railway.app'
+});
+
+// User account operation (uses Supabase token)
+const profile = await spine.getUserProfile();
+
+// API operation (uses API key)
+const execution = await spine.executeFlow('credit-analysis', {
+  customer_id: '12345'
+});
 ```
 
 ## 🔧 Advanced Usage
