@@ -41,6 +41,28 @@ export interface APIKeyInfo {
   active: boolean;
 }
 
+// API Key Management Types
+export interface ApiKeyStatus {
+  has_api_key: boolean;
+  api_key: string | null;
+  credits?: number;
+  rate_limit?: number;
+  created_at?: string;
+  last_used_at?: string | null;
+  message?: string;
+}
+
+export interface ApiKeyGenerateResponse {
+  message: string;
+  api_key: string;
+  action: 'created' | 'regenerated';
+}
+
+export interface ApiKeyRevokeResponse {
+  message: string;
+  status: 'revoked';
+}
+
 // Environment Variable Types
 export interface AgentEnvironmentField {
   /** Field type for validation and UI rendering */

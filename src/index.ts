@@ -32,6 +32,9 @@ export type {
   // User management
   UserInfo,
   APIKeyInfo,
+  ApiKeyStatus,
+  ApiKeyGenerateResponse,
+  ApiKeyRevokeResponse,
   
   // Core entities
   Agent,
@@ -133,7 +136,7 @@ export {
 } from './webhooks';
 
 // Version
-export const VERSION = '2.1.0';
+export const VERSION = '2.3.0';
 
 // Default export for convenience
 import { AISpine as DefaultExport } from './spine';

@@ -9,7 +9,10 @@ import {
   AISpineConfig, 
   RequestOptions, 
   SDKResponse,
-  UserInfo
+  UserInfo,
+  ApiKeyStatus,
+  ApiKeyGenerateResponse,
+  ApiKeyRevokeResponse
 } from './types';
 import { 
   createErrorFromResponse, 
@@ -55,7 +58,7 @@ export class AISpineClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'User-Agent': '@ai-spine/sdk-js/2.1.0',
+        'User-Agent': '@ai-spine/sdk-js/2.3.0',
       },
     });
 
@@ -260,6 +263,71 @@ export class AISpineClient {
   public async checkCredits(): Promise<number> {
     const user = await this.getCurrentUser();
     return user.credits;
+  }
+
+  // API Key Management Methods
+
+  /**
+   * Check if a user has an API key generated
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns API key status and details
+   */
+  public async checkUserApiKey(userId: string): Promise<ApiKeyStatus> {
+    // These endpoints don't require authentication, so we'll create a custom request
+    const response = await axios.get<ApiKeyStatus>(
+      `${this.config.baseURL}/api/v1/user/keys/my-key`,
+      {
+        params: { user_id: userId },
+        timeout: this.config.timeout,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * Generate or regenerate an API key for a user
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns New API key and action taken
+   */
+  public async generateUserApiKey(userId: string): Promise<ApiKeyGenerateResponse> {
+    // These endpoints don't require authentication, so we'll create a custom request
+    const response = await axios.post<ApiKeyGenerateResponse>(
+      `${this.config.baseURL}/api/v1/user/keys/generate`,
+      { user_id: userId },
+      {
+        timeout: this.config.timeout,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * Revoke (delete) a user's API key
+   * @param userId - Supabase Auth user ID (UUID)
+   * @returns Confirmation of revocation
+   */
+  public async revokeUserApiKey(userId: string): Promise<ApiKeyRevokeResponse> {
+    // These endpoints don't require authentication, so we'll create a custom request
+    const response = await axios.delete<ApiKeyRevokeResponse>(
+      `${this.config.baseURL}/api/v1/user/keys/revoke`,
+      {
+        data: { user_id: userId },
+        timeout: this.config.timeout,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      }
+    );
+    return response.data;
   }
 
   // Utility Methods
