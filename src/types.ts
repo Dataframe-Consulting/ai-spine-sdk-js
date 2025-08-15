@@ -8,6 +8,8 @@
 export interface AISpineConfig {
   /** API key for authentication (optional for user management endpoints) */
   apiKey?: string;
+  /** Supabase access token for secure user account endpoints */
+  supabaseToken?: string;
   /** Base URL for the AI Spine API */
   baseURL?: string;
   /** Request timeout in milliseconds */
@@ -61,6 +63,30 @@ export interface ApiKeyGenerateResponse {
 export interface ApiKeyRevokeResponse {
   message: string;
   status: 'revoked';
+}
+
+// User Account Management Types (Secure endpoints with Supabase token)
+export interface UserProfile {
+  id: string;
+  email: string;
+  name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserApiKeyStatus {
+  has_api_key: boolean;
+  api_key_masked?: string;
+  credits: number;
+  rate_limit: number;
+  created_at?: string;
+  last_used_at?: string | null;
+}
+
+export interface UserApiKeyGenerateResponse {
+  message: string;
+  api_key: string;
+  action: 'created' | 'regenerated';
 }
 
 // Environment Variable Types

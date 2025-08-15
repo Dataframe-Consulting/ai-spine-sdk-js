@@ -12,7 +12,10 @@ import {
   UserInfo,
   ApiKeyStatus,
   ApiKeyGenerateResponse,
-  ApiKeyRevokeResponse
+  ApiKeyRevokeResponse,
+  UserProfile,
+  UserApiKeyStatus,
+  UserApiKeyGenerateResponse
 } from './types';
 import { 
   createErrorFromResponse, 
@@ -43,6 +46,7 @@ export class AISpineClient {
     // Set defaults
     this.config = {
       apiKey: config.apiKey,
+      supabaseToken: config.supabaseToken,
       baseURL: config.baseURL || 'https://ai-spine-api.up.railway.app',
       timeout: config.timeout || 30000,
       retries: config.retries || 3,
@@ -58,7 +62,7 @@ export class AISpineClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'User-Agent': '@ai-spine/sdk-js/2.3.1',
+        'User-Agent': '@ai-spine/sdk-js/2.4.0',
       },
     });
 
@@ -265,9 +269,10 @@ export class AISpineClient {
     return user.credits;
   }
 
-  // API Key Management Methods
+  // API Key Management Methods (DEPRECATED - Use secure methods above)
 
   /**
+   * @deprecated Use getUserApiKeyStatus() with Supabase token instead
    * Check if a user has an API key generated
    * @param userId - Supabase Auth user ID (UUID)
    * @returns API key status and details
@@ -289,6 +294,7 @@ export class AISpineClient {
   }
 
   /**
+   * @deprecated Use generateUserApiKey() with Supabase token instead
    * Generate or regenerate an API key for a user
    * @param userId - Supabase Auth user ID (UUID)
    * @returns New API key and action taken
@@ -310,6 +316,7 @@ export class AISpineClient {
   }
 
   /**
+   * @deprecated Use revokeApiKey() with Supabase token instead
    * Revoke (delete) a user's API key
    * @param userId - Supabase Auth user ID (UUID)
    * @returns Confirmation of revocation
@@ -324,6 +331,92 @@ export class AISpineClient {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+        }
+      }
+    );
+    return response.data;
+  }
+
+  // Secure User Account Methods (Using Supabase Token)
+
+  /**
+   * Get user profile using Supabase token
+   * @returns User profile information
+   */
+  public async getUserProfile(): Promise<UserProfile> {
+    if (!this.config.supabaseToken) {
+      throw new Error('Supabase token is required for user account methods');
+    }
+
+    const response = await this.get<UserProfile>(
+      '/api/v1/user/account/profile',
+      undefined,
+      {
+        headers: {
+          'Authorization': `Bearer ${this.config.supabaseToken}`
+        }
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * Get user's API key status using Supabase token
+   * @returns API key status (masked key, credits, etc.)
+   */
+  public async getUserApiKeyStatus(): Promise<UserApiKeyStatus> {
+    if (!this.config.supabaseToken) {
+      throw new Error('Supabase token is required for user account methods');
+    }
+
+    const response = await this.get<UserApiKeyStatus>(
+      '/api/v1/user/account/api-key/status',
+      undefined,
+      {
+        headers: {
+          'Authorization': `Bearer ${this.config.supabaseToken}`
+        }
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * Generate or regenerate user's API key using Supabase token
+   * @returns New API key (shown only once)
+   */
+  public async generateApiKey(): Promise<UserApiKeyGenerateResponse> {
+    if (!this.config.supabaseToken) {
+      throw new Error('Supabase token is required for user account methods');
+    }
+
+    const response = await this.post<UserApiKeyGenerateResponse>(
+      '/api/v1/user/account/api-key/generate',
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${this.config.supabaseToken}`
+        }
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * Revoke user's API key using Supabase token
+   * @returns Confirmation message
+   */
+  public async revokeApiKey(): Promise<{ message: string; status: string }> {
+    if (!this.config.supabaseToken) {
+      throw new Error('Supabase token is required for user account methods');
+    }
+
+    const response = await this.post<{ message: string; status: string }>(
+      '/api/v1/user/account/api-key/revoke',
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${this.config.supabaseToken}`
         }
       }
     );

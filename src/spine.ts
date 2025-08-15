@@ -56,12 +56,11 @@ export class AISpine {
       ? { apiKey: config }
       : config;
 
-    // API key is optional for user management endpoints
-    // If no API key provided, use a dummy key (the user management endpoints don't require auth)
-    if (!finalConfig.apiKey) {
+    // API key is optional when using Supabase token for user account methods
+    if (!finalConfig.apiKey && !finalConfig.supabaseToken) {
       finalConfig.apiKey = 'sk_no_auth_required';
-      console.warn('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
-    } else if (!finalConfig.apiKey.startsWith('sk_')) {
+      console.warn('No API key or Supabase token provided. Limited functionality available.');
+    } else if (finalConfig.apiKey && !finalConfig.apiKey.startsWith('sk_')) {
       console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
     }
 
@@ -841,7 +840,95 @@ export class AISpine {
     return this.client.getCurrentUser();
   }
 
+  // Secure User Account Methods (Using Supabase Token)
+
   /**
+   * Get user profile using Supabase authentication
+   * 
+   * @returns Promise resolving to user profile
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const profile = await spine.getUserProfile();
+   * console.log('User:', profile.email);
+   * ```
+   */
+  public async getUserProfile() {
+    return this.client.getUserProfile();
+  }
+
+  /**
+   * Get user's API key status using Supabase authentication
+   * 
+   * @returns Promise resolving to API key status (masked)
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const status = await spine.getUserApiKeyStatus();
+   * if (!status.has_api_key) {
+   *   console.log('No API key exists');
+   * } else {
+   *   console.log('Masked key:', status.api_key_masked);
+   *   console.log('Credits:', status.credits);
+   * }
+   * ```
+   */
+  public async getUserApiKeyStatus() {
+    return this.client.getUserApiKeyStatus();
+  }
+
+  /**
+   * Generate or regenerate API key using Supabase authentication
+   * 
+   * @returns Promise resolving to new API key (shown once)
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const result = await spine.generateApiKey();
+   * console.log('New API key:', result.api_key);
+   * console.log('Action:', result.action); // 'created' or 'regenerated'
+   * // Save this key securely - won't be shown again!
+   * ```
+   */
+  public async generateApiKey() {
+    return this.client.generateApiKey();
+  }
+
+  /**
+   * Revoke API key using Supabase authentication
+   * 
+   * @returns Promise resolving to confirmation
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const result = await spine.revokeApiKey();
+   * console.log('API key revoked:', result.message);
+   * ```
+   */
+  public async revokeApiKey() {
+    return this.client.revokeApiKey();
+  }
+
+  // Deprecated User Key Methods (Use secure methods above)
+
+  /**
+   * @deprecated Use getUserApiKeyStatus() with Supabase token instead
    * Check if a user has an API key generated
    * 
    * @param userId - Supabase Auth user ID (UUID)
@@ -865,6 +952,7 @@ export class AISpine {
   }
 
   /**
+   * @deprecated Use generateApiKey() with Supabase token instead
    * Generate or regenerate an API key for a user
    * 
    * @param userId - Supabase Auth user ID (UUID)
@@ -885,6 +973,7 @@ export class AISpine {
   }
 
   /**
+   * @deprecated Use revokeApiKey() with Supabase token instead
    * Revoke (delete) a user's API key
    * 
    * @param userId - Supabase Auth user ID (UUID)

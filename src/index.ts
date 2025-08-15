@@ -32,9 +32,14 @@ export type {
   // User management
   UserInfo,
   APIKeyInfo,
-  ApiKeyStatus,
-  ApiKeyGenerateResponse,
-  ApiKeyRevokeResponse,
+  ApiKeyStatus, // Deprecated
+  ApiKeyGenerateResponse, // Deprecated
+  ApiKeyRevokeResponse, // Deprecated
+  
+  // Secure user account types (NEW in v2.4.0)
+  UserProfile,
+  UserApiKeyStatus,
+  UserApiKeyGenerateResponse,
   
   // Core entities
   Agent,
@@ -136,7 +141,7 @@ export {
 } from './webhooks';
 
 // Version
-export const VERSION = '2.3.1';
+export const VERSION = '2.4.0';
 
 // Default export for convenience
 import { AISpine as DefaultExport } from './spine';
