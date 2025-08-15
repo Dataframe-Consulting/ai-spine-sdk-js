@@ -28,7 +28,7 @@ describe('AISpine', () => {
       
       const spine = new AISpine({});
       expect(spine).toBeInstanceOf(AISpine);
-      expect(warnSpy).toHaveBeenCalledWith('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
+      expect(warnSpy).toHaveBeenCalledWith('No API key or Supabase token provided. Limited functionality available.');
       
       warnSpy.mockRestore();
     });
@@ -38,7 +38,7 @@ describe('AISpine', () => {
       
       const spine = new AISpine('');
       expect(spine).toBeInstanceOf(AISpine);
-      expect(warnSpy).toHaveBeenCalledWith('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
+      expect(warnSpy).toHaveBeenCalledWith('No API key or Supabase token provided. Limited functionality available.');
       
       warnSpy.mockRestore();
     });
