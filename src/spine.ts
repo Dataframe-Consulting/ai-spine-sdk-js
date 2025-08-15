@@ -60,7 +60,10 @@ export class AISpine {
     if (!finalConfig.apiKey && !finalConfig.supabaseToken) {
       finalConfig.apiKey = 'sk_no_auth_required';
       console.warn('No API key or Supabase token provided. Limited functionality available.');
-    } else if (finalConfig.apiKey && !finalConfig.apiKey.startsWith('sk_')) {
+    } else if (!finalConfig.apiKey && finalConfig.supabaseToken) {
+      // Has Supabase token but no API key - set dummy key for compatibility
+      finalConfig.apiKey = 'sk_no_auth_required';
+    } else if (finalConfig.apiKey && finalConfig.apiKey !== 'sk_no_auth_required' && !finalConfig.apiKey.startsWith('sk_')) {
       console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
     }
 

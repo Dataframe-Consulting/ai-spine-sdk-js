@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [2.4.1] - 2025-01-14
+
+### Fixed
+- Fixed incorrect warning when initializing SDK with Supabase token but no API key
+- Fixed "Refused to set unsafe header User-Agent" error in browsers
+- Added X-SDK-Version header for browser compatibility
+- User-Agent header now only set in Node.js environments
+
 ## [2.4.0] - 2025-01-14
 
 ### Added
