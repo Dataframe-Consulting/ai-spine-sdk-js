@@ -100,7 +100,7 @@ describe('Agent Registration', () => {
         name: 'Test Agent',
         description: 'A test agent',
         endpoint: 'https://api.example.com',
-        capabilities: ['text-processing']
+        capabilities: ['conversation']
         // agent_type not specified
       };
 
@@ -129,7 +129,7 @@ describe('Agent Registration', () => {
           name: 'Test Agent',
           description: 'A test agent',
           endpoint: 'https://api.example.com',
-          capabilities: ['conversation', 'information_gathering'],
+          capabilities: ['conversation'],
           agent_type: 'processor', // Should default to 'processor'
           is_active: true // Should default to true
         }),
