@@ -116,6 +116,20 @@ describe('Flow CRUD Operations', () => {
     });
 
     it('should throw error when Supabase token is missing', async () => {
+      // Create a new mock without supabaseToken
+      const mockClientNoToken = {
+        ...mockClient,
+        getConfig: jest.fn().mockReturnValue({
+          apiKey: 'sk_test',
+          supabaseToken: undefined,
+          baseURL: 'https://api.example.com',
+          timeout: 30000,
+          retries: 3,
+          debug: false,
+        }),
+      };
+      (AISpineClient as jest.MockedClass<typeof AISpineClient>).mockImplementation(() => mockClientNoToken as any);
+      
       spine = new AISpine({ apiKey: 'sk_test' });
 
       await expect(spine.createFlow({
@@ -203,6 +217,20 @@ describe('Flow CRUD Operations', () => {
     });
 
     it('should throw error when Supabase token is missing', async () => {
+      // Create a new mock without supabaseToken
+      const mockClientNoToken = {
+        ...mockClient,
+        getConfig: jest.fn().mockReturnValue({
+          apiKey: 'sk_test',
+          supabaseToken: undefined,
+          baseURL: 'https://api.example.com',
+          timeout: 30000,
+          retries: 3,
+          debug: false,
+        }),
+      };
+      (AISpineClient as jest.MockedClass<typeof AISpineClient>).mockImplementation(() => mockClientNoToken as any);
+      
       spine = new AISpine({ apiKey: 'sk_test' });
 
       await expect(spine.getMyFlows()).rejects.toThrow('Supabase token is required for getting user flows');
@@ -264,6 +292,20 @@ describe('Flow CRUD Operations', () => {
     });
 
     it('should throw error when Supabase token is missing', async () => {
+      // Create a new mock without supabaseToken
+      const mockClientNoToken = {
+        ...mockClient,
+        getConfig: jest.fn().mockReturnValue({
+          apiKey: 'sk_test',
+          supabaseToken: undefined,
+          baseURL: 'https://api.example.com',
+          timeout: 30000,
+          retries: 3,
+          debug: false,
+        }),
+      };
+      (AISpineClient as jest.MockedClass<typeof AISpineClient>).mockImplementation(() => mockClientNoToken as any);
+      
       spine = new AISpine({ apiKey: 'sk_test' });
 
       await expect(spine.updateFlow('test-flow', { name: 'Test' }))
@@ -303,6 +345,20 @@ describe('Flow CRUD Operations', () => {
     });
 
     it('should throw error when Supabase token is missing', async () => {
+      // Create a new mock without supabaseToken
+      const mockClientNoToken = {
+        ...mockClient,
+        getConfig: jest.fn().mockReturnValue({
+          apiKey: 'sk_test',
+          supabaseToken: undefined,
+          baseURL: 'https://api.example.com',
+          timeout: 30000,
+          retries: 3,
+          debug: false,
+        }),
+      };
+      (AISpineClient as jest.MockedClass<typeof AISpineClient>).mockImplementation(() => mockClientNoToken as any);
+      
       spine = new AISpine({ apiKey: 'sk_test' });
 
       await expect(spine.deleteFlow('test-flow'))
@@ -312,12 +368,12 @@ describe('Flow CRUD Operations', () => {
 
   describe('Error Handling', () => {
     it('should handle 409 conflict when creating duplicate flow', async () => {
-      mockClient.post.mockRejectedValue({
-        response: {
-          status: 409,
-          data: { message: 'Flow already exists' }
-        }
-      });
+      const error = new Error('Flow already exists');
+      (error as any).response = {
+        status: 409,
+        data: { message: 'Flow already exists' }
+      };
+      mockClient.post.mockRejectedValue(error);
 
       await expect(spine.createFlow({
         flow_id: 'existing-flow',
@@ -329,34 +385,34 @@ describe('Flow CRUD Operations', () => {
     });
 
     it('should handle 403 forbidden when updating flow without ownership', async () => {
-      mockClient.put.mockRejectedValue({
-        response: {
-          status: 403,
-          data: { message: 'You do not own this flow' }
-        }
-      });
+      const error = new Error('You do not own this flow');
+      (error as any).response = {
+        status: 403,
+        data: { message: 'You do not own this flow' }
+      };
+      mockClient.put.mockRejectedValue(error);
 
       await expect(spine.updateFlow('system-flow', { name: 'Test' })).rejects.toThrow();
     });
 
     it('should handle 403 forbidden when deleting system flow', async () => {
-      mockClient.delete.mockRejectedValue({
-        response: {
-          status: 403,
-          data: { message: 'Cannot delete system flow' }
-        }
-      });
+      const error = new Error('Cannot delete system flow');
+      (error as any).response = {
+        status: 403,
+        data: { message: 'Cannot delete system flow' }
+      };
+      mockClient.delete.mockRejectedValue(error);
 
       await expect(spine.deleteFlow('credit_analysis')).rejects.toThrow();
     });
 
     it('should handle 404 not found', async () => {
-      mockClient.put.mockRejectedValue({
-        response: {
-          status: 404,
-          data: { message: 'Flow not found' }
-        }
-      });
+      const error = new Error('Flow not found');
+      (error as any).response = {
+        status: 404,
+        data: { message: 'Flow not found' }
+      };
+      mockClient.put.mockRejectedValue(error);
 
       await expect(spine.updateFlow('non-existent', { name: 'Test' })).rejects.toThrow();
     });
