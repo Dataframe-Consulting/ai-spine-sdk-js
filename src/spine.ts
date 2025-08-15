@@ -290,7 +290,7 @@ export class AISpine {
    *   description: 'A custom AI agent for specific tasks',
    *   endpoint: 'https://my-agent.example.com/api',
    *   capabilities: ['text-processing', 'data-analysis'],
-   *   agent_type: 'processor', // 'input' | 'processor' | 'output' | 'custom'
+   *   agent_type: 'processor', // 'input' | 'processor' | 'output' | 'conditional'
    *   is_active: true
    * });
    * ```
@@ -302,7 +302,7 @@ export class AISpine {
     // Ensure agent_type is included with a default value
     const payload = {
       ...sanitizeInput(config),
-      agent_type: config.agent_type || 'custom',
+      agent_type: config.agent_type || 'processor', // Default to 'processor' instead of 'custom'
       is_active: config.is_active ?? true
     };
 

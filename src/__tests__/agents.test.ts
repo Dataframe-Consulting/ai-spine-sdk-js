@@ -94,7 +94,7 @@ describe('Agent Registration', () => {
       expect(result).toEqual(expectedResponse);
     });
 
-    it('should default to custom agent_type when not specified', async () => {
+    it('should default to processor agent_type when not specified', async () => {
       const agentConfig = {
         agent_id: 'test-agent',
         name: 'Test Agent',
@@ -106,7 +106,7 @@ describe('Agent Registration', () => {
 
       const expectedResponse = {
         ...agentConfig,
-        agent_type: 'custom',
+        agent_type: 'processor',
         is_active: true,
         status: 'active' as const,
         created_at: '2025-01-15T10:00:00Z',
@@ -130,12 +130,12 @@ describe('Agent Registration', () => {
           description: 'A test agent',
           endpoint: 'https://api.example.com',
           capabilities: ['text-processing'],
-          agent_type: 'custom', // Should default to 'custom'
+          agent_type: 'processor', // Should default to 'processor'
           is_active: true // Should default to true
         }),
         {}
       );
-      expect(result.agent_type).toBe('custom');
+      expect(result.agent_type).toBe('processor');
     });
 
     it('should default is_active to true when not specified', async () => {
@@ -204,7 +204,7 @@ describe('Agent Registration', () => {
     });
 
     it('should handle all valid agent_type values', async () => {
-      const agentTypes: Array<'input' | 'processor' | 'output' | 'custom'> = ['input', 'processor', 'output', 'custom'];
+      const agentTypes: Array<'input' | 'processor' | 'output' | 'conditional'> = ['input', 'processor', 'output', 'conditional'];
       
       for (const agent_type of agentTypes) {
         mockClient.post.mockResolvedValue({
