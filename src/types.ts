@@ -114,7 +114,8 @@ export interface Agent {
   description: string;
   endpoint: string;
   capabilities: string[];
-  type?: string;
+  agent_type: 'input' | 'processor' | 'output' | 'custom';
+  is_active?: boolean;
   status: 'active' | 'inactive' | 'error';
   last_seen?: string;
   created_at?: string;
@@ -129,7 +130,8 @@ export interface AgentConfig {
   description: string;
   endpoint: string;
   capabilities: string[];
-  type?: string;
+  agent_type?: 'input' | 'processor' | 'output' | 'custom';
+  is_active?: boolean;
   /** Schema defining environment variables this agent requires */
   environment_schema?: AgentEnvironmentSchema;
 }

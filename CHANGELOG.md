@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [2.5.1] - 2025-01-15
+
+### Fixed
+- Fixed agent registration error 500 by adding required `agent_type` field
+- Agent registration now properly sends `agent_type` with default value 'custom'
+- Added `is_active` field with default value `true` for agent registration
+
+### Changed
+- Updated `Agent` and `AgentConfig` types to include `agent_type` and `is_active` fields
+- `agent_type` accepts: 'input', 'processor', 'output', or 'custom'
+
 ## [2.5.0] - 2025-01-15
 
 ### Added
