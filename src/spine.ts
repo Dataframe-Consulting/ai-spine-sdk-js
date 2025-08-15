@@ -289,7 +289,9 @@ export class AISpine {
    *   name: 'My Custom Agent',
    *   description: 'A custom AI agent for specific tasks',
    *   endpoint: 'https://my-agent.example.com/api',
-   *   capabilities: ['text-processing', 'data-analysis']
+   *   capabilities: ['text-processing', 'data-analysis'],
+   *   agent_type: 'processor', // 'input' | 'processor' | 'output' | 'custom'
+   *   is_active: true
    * });
    * ```
    */
@@ -297,8 +299,14 @@ export class AISpine {
     const errors = validateAgentConfig(config);
     throwIfValidationErrors(errors, 'Agent registration validation failed');
 
-    const sanitizedConfig = sanitizeInput(config);
-    const response = await this.client.post<Agent>('/agents', sanitizedConfig, options);
+    // Ensure agent_type is included with a default value
+    const payload = {
+      ...sanitizeInput(config),
+      agent_type: config.agent_type || 'custom',
+      is_active: config.is_active ?? true
+    };
+
+    const response = await this.client.post<Agent>('/agents', payload, options);
     return response.data;
   }
 

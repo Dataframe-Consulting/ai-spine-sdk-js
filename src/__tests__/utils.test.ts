@@ -83,6 +83,7 @@ describe('Input validation', () => {
       description: 'A test agent',
       endpoint: 'https://api.example.com',
       capabilities: ['text-processing'],
+      agent_type: 'processor' as const,
     };
 
     it('should validate correct agent config', () => {
