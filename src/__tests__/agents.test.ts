@@ -79,7 +79,7 @@ describe('Agent Registration', () => {
       const result = await spine.registerAgent(agentConfig);
 
       expect(mockClient.post).toHaveBeenCalledWith(
-        '/agents',
+        '/api/v1/agents',
         expect.objectContaining({
           agent_id: 'test-agent',
           name: 'Test Agent',
@@ -123,7 +123,7 @@ describe('Agent Registration', () => {
       const result = await spine.registerAgent(agentConfig);
 
       expect(mockClient.post).toHaveBeenCalledWith(
-        '/agents',
+        '/api/v1/agents',
         expect.objectContaining({
           agent_id: 'test-agent',
           name: 'Test Agent',
@@ -163,7 +163,7 @@ describe('Agent Registration', () => {
       await spine.registerAgent(agentConfig);
 
       expect(mockClient.post).toHaveBeenCalledWith(
-        '/agents',
+        '/api/v1/agents',
         expect.objectContaining({
           is_active: true // Should default to true
         }),
@@ -195,7 +195,7 @@ describe('Agent Registration', () => {
       await spine.registerAgent(agentConfig);
 
       expect(mockClient.post).toHaveBeenCalledWith(
-        '/agents',
+        '/api/v1/agents',
         expect.objectContaining({
           is_active: false // Should respect false value
         }),

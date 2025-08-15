@@ -122,7 +122,7 @@ export class AISpine {
       input_data: sanitizedInput,
     };
 
-    const response = await this.client.post<ExecutionResponse>('/flows/execute', request, options);
+    const response = await this.client.post<ExecutionResponse>('/api/v1/flows/execute', request, options);
     return response.data;
   }
 
@@ -148,7 +148,7 @@ export class AISpine {
       throw new ValidationError('Invalid execution ID format');
     }
 
-    const response = await this.client.get<ExecutionContext>(`/executions/${executionId}`, undefined, options);
+    const response = await this.client.get<ExecutionContext>(`/api/v1/executions/${executionId}`, undefined, options);
     return response.data;
   }
 
@@ -218,7 +218,7 @@ export class AISpine {
    * ```
    */
   public async listFlows(options: RequestOptions = {}): Promise<Flow[]> {
-    const response = await this.client.get<Flow[]>('/flows', undefined, options);
+    const response = await this.client.get<Flow[]>('/api/v1/flows', undefined, options);
     return response.data;
   }
 
@@ -234,7 +234,7 @@ export class AISpine {
       throw new ValidationError('Invalid flow ID format');
     }
 
-    const response = await this.client.get<Flow>(`/flows/${flowId}`, undefined, options);
+    const response = await this.client.get<Flow>(`/api/v1/flows/${flowId}`, undefined, options);
     return response.data;
   }
 
@@ -255,7 +255,7 @@ export class AISpine {
    * ```
    */
   public async listAgents(options: RequestOptions = {}): Promise<Agent[]> {
-    const response = await this.client.get<Agent[]>('/agents', undefined, options);
+    const response = await this.client.get<Agent[]>('/api/v1/agents', undefined, options);
     return response.data;
   }
 
@@ -271,7 +271,7 @@ export class AISpine {
       throw new ValidationError('Invalid agent ID format');
     }
 
-    const response = await this.client.get<Agent>(`/agents/${agentId}`, undefined, options);
+    const response = await this.client.get<Agent>(`/api/v1/agents/${agentId}`, undefined, options);
     return response.data;
   }
 
@@ -306,7 +306,7 @@ export class AISpine {
       is_active: config.is_active ?? true
     };
 
-    const response = await this.client.post<Agent>('/agents', payload, options);
+    const response = await this.client.post<Agent>('/api/v1/agents', payload, options);
     return response.data;
   }
 
@@ -319,7 +319,7 @@ export class AISpine {
    */
   public async testAgent(endpoint: string, options: RequestOptions = {}): Promise<{ connected: boolean; message?: string }> {
     const response = await this.client.post<{ connected: boolean; message?: string }>(
-      '/agents/test',
+      '/api/v1/agents/test',
       { endpoint },
       options
     );
@@ -344,7 +344,7 @@ export class AISpine {
     } = {},
     options: RequestOptions = {}
   ): Promise<ExecutionContext[]> {
-    const response = await this.client.get<ExecutionContext[]>('/executions', filters, options);
+    const response = await this.client.get<ExecutionContext[]>('/api/v1/executions', filters, options);
     return response.data;
   }
 

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [2.5.2] - 2025-01-15
+
+### Fixed
+- **CRITICAL**: Fixed all API endpoints to use correct `/api/v1/` prefix
+- Agent registration was failing with 401 due to incorrect path `/agents` instead of `/api/v1/agents`
+- Fixed paths for: agents, flows, executions endpoints
+- All API calls now correctly use `/api/v1/` prefix
+
 ## [2.5.1] - 2025-01-15
 
 ### Fixed
