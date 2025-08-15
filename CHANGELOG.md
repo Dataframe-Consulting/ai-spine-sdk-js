@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-01-14
+
+### Added
+- New API key management methods for user-level key operations
+  - `checkUserApiKey(userId)` - Check if a user has an API key
+  - `generateUserApiKey(userId)` - Generate or regenerate a user's API key
+  - `revokeUserApiKey(userId)` - Revoke (delete) a user's API key
+- TypeScript types for API key management responses
+  - `ApiKeyStatus` - Status and details of a user's API key
+  - `ApiKeyGenerateResponse` - Response from key generation
+  - `ApiKeyRevokeResponse` - Response from key revocation
+- Comprehensive test suite for API key management
+- New example file demonstrating API key lifecycle management
+- API Key Management section in README with complete examples
+
+### Changed
+- API key management endpoints do not require authentication (Bearer token)
+- Updated version to 2.3.0 across all package files
+
 ## [2.2.1] - 2024-01-13
 
 ### Added
