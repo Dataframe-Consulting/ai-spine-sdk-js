@@ -44,6 +44,7 @@ export type {
   // Core entities
   Agent,
   AgentConfig,
+  AgentCapability,
   Flow,
   FlowNode,
   FlowExecutionRequest,
@@ -148,7 +149,7 @@ export {
 } from './webhooks';
 
 // Version
-export const VERSION = '2.5.3';
+export const VERSION = '2.5.4';
 
 // Default export for convenience
 import { AISpine as DefaultExport } from './spine';

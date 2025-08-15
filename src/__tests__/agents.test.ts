@@ -57,7 +57,7 @@ describe('Agent Registration', () => {
         name: 'Test Agent',
         description: 'A test agent',
         endpoint: 'https://api.example.com',
-        capabilities: ['text-processing'],
+        capabilities: ['conversation', 'information_gathering'],
         agent_type: 'processor' as const,
         is_active: true
       };
@@ -85,7 +85,7 @@ describe('Agent Registration', () => {
           name: 'Test Agent',
           description: 'A test agent',
           endpoint: 'https://api.example.com',
-          capabilities: ['text-processing'],
+          capabilities: ['conversation', 'information_gathering'],
           agent_type: 'processor',
           is_active: true
         }),
@@ -129,7 +129,7 @@ describe('Agent Registration', () => {
           name: 'Test Agent',
           description: 'A test agent',
           endpoint: 'https://api.example.com',
-          capabilities: ['text-processing'],
+          capabilities: ['conversation', 'information_gathering'],
           agent_type: 'processor', // Should default to 'processor'
           is_active: true // Should default to true
         }),
@@ -144,7 +144,7 @@ describe('Agent Registration', () => {
         name: 'Test Agent',
         description: 'A test agent',
         endpoint: 'https://api.example.com',
-        capabilities: ['text-processing'],
+        capabilities: ['conversation', 'information_gathering'],
         agent_type: 'input' as const
         // is_active not specified
       };
@@ -177,7 +177,7 @@ describe('Agent Registration', () => {
         name: 'Test Agent',
         description: 'A test agent',
         endpoint: 'https://api.example.com',
-        capabilities: ['text-processing'],
+        capabilities: ['conversation', 'information_gathering'],
         agent_type: 'output' as const,
         is_active: false
       };
@@ -213,7 +213,7 @@ describe('Agent Registration', () => {
             name: `${agent_type} Agent`,
             description: 'Test',
             endpoint: 'https://api.example.com',
-            capabilities: ['test'],
+            capabilities: ['conversation'],
             agent_type,
             is_active: true,
             status: 'active' as const
@@ -228,7 +228,7 @@ describe('Agent Registration', () => {
           name: `${agent_type} Agent`,
           description: 'Test',
           endpoint: 'https://api.example.com',
-          capabilities: ['test'],
+          capabilities: ['conversation'],
           agent_type
         });
 

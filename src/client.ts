@@ -59,12 +59,12 @@ export class AISpineClient {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Authorization': `Bearer ${this.config.apiKey}`,
-      'X-SDK-Version': 'ai-spine-sdk-js/2.5.3',
+      'X-SDK-Version': 'ai-spine-sdk-js/2.5.4',
     };
 
     // Only add User-Agent in Node.js environment (not in browsers)
     if (typeof window === 'undefined') {
-      headers['User-Agent'] = '@ai-spine/sdk-js/2.5.3';
+      headers['User-Agent'] = '@ai-spine/sdk-js/2.5.4';
     }
 
     this.http = axios.create({

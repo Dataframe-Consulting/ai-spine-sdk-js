@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## [2.5.4] - 2025-01-15
+
+### Added
+- Added `AgentCapability` type with valid capability values
+- Added validation for agent capabilities to prevent invalid values
+
+### Changed
+- Agent capabilities now strictly enforced to use only valid enum values:
+  - `conversation` - Para agentes conversacionales
+  - `information_gathering` - Para recolectar información
+  - `credit_analysis` - Para análisis crediticio
+  - `risk_assessment` - Para evaluación de riesgos
+  - `document_processing` - Para procesar documentos
+  - `decision_making` - Para toma de decisiones
+- Updated all examples and tests to use valid capabilities
+
+### Fixed
+- Agents with invalid capabilities will now be rejected at SDK level
+- Prevents agents from being saved but not loading due to invalid capabilities
+
 ## [2.5.3] - 2025-01-15
 
 ### Fixed
