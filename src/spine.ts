@@ -442,7 +442,7 @@ export class AISpine {
   /**
    * Get current SDK configuration
    */
-  public getConfig(): Required<Omit<AISpineConfig, 'apiKey'>> & { apiKey?: string } {
+  public getConfig(): AISpineConfig & { apiKey: string } {
     return this.client.getConfig();
   }
 
