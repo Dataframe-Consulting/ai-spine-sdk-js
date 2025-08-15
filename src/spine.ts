@@ -289,7 +289,7 @@ export class AISpine {
    *   name: 'My Custom Agent',
    *   description: 'A custom AI agent for specific tasks',
    *   endpoint: 'https://my-agent.example.com/api',
-   *   capabilities: ['text-processing', 'data-analysis'],
+   *   capabilities: ['conversation', 'information_gathering'], // Valid capabilities only
    *   agent_type: 'processor', // 'input' | 'processor' | 'output' | 'conditional'
    *   is_active: true
    * });
@@ -298,6 +298,25 @@ export class AISpine {
   public async registerAgent(config: AgentConfig, options: RequestOptions = {}): Promise<Agent> {
     const errors = validateAgentConfig(config);
     throwIfValidationErrors(errors, 'Agent registration validation failed');
+
+    // Validate capabilities
+    const validCapabilities = [
+      'conversation',
+      'information_gathering', 
+      'credit_analysis',
+      'risk_assessment',
+      'document_processing',
+      'decision_making'
+    ];
+    
+    if (config.capabilities && config.capabilities.length > 0) {
+      const invalidCapabilities = config.capabilities.filter(cap => !validCapabilities.includes(cap));
+      if (invalidCapabilities.length > 0) {
+        throw new ValidationError(
+          `Invalid capabilities: ${invalidCapabilities.join(', ')}. Valid values are: ${validCapabilities.join(', ')}`
+        );
+      }
+    }
 
     // Ensure agent_type is included with a default value
     const payload = {

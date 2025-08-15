@@ -107,13 +107,22 @@ export interface AgentEnvironmentSchema {
   [fieldName: string]: AgentEnvironmentField;
 }
 
+// Agent Capability Types
+export type AgentCapability = 
+  | 'conversation'           // Para agentes conversacionales
+  | 'information_gathering'   // Para recolectar información
+  | 'credit_analysis'        // Para análisis crediticio
+  | 'risk_assessment'        // Para evaluación de riesgos
+  | 'document_processing'    // Para procesar documentos
+  | 'decision_making';       // Para toma de decisiones
+
 // Core Entity Types
 export interface Agent {
   agent_id: string;
   name: string;
   description: string;
   endpoint: string;
-  capabilities: string[];
+  capabilities: AgentCapability[];
   agent_type: 'input' | 'processor' | 'output' | 'conditional';
   is_active?: boolean;
   status: 'active' | 'inactive' | 'error';
@@ -129,7 +138,7 @@ export interface AgentConfig {
   name: string;
   description: string;
   endpoint: string;
-  capabilities: string[];
+  capabilities: AgentCapability[];
   agent_type?: 'input' | 'processor' | 'output' | 'conditional';
   is_active?: boolean;
   /** Schema defining environment variables this agent requires */
