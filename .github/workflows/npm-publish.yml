@@ -84,26 +84,29 @@ jobs:
       
       - name: Create GitHub Release
         if: steps.version.outputs.changed == 'true'
-        uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.version.outputs.current }}
-          release_name: v${{ steps.version.outputs.current }}
-          body: |
-            ## 🚀 Version ${{ steps.version.outputs.current }}
-            
-            ${{ steps.changelog.outputs.content }}
-            
-            ---
-            
-            ### 📦 Installation
-            ```bash
-            npm install ai-spine-sdk@${{ steps.version.outputs.current }}
-            ```
-            
-            ### 📚 Links
-            - [View on npm](https://www.npmjs.com/package/ai-spine-sdk/v/${{ steps.version.outputs.current }})
-            - [Full Changelog](https://github.com/Dataframe-Consulting/ai-spine-sdk-js/blob/main/CHANGELOG.md)
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create release body
+          cat << EOF > release-notes.md
+          ## 🚀 Version ${{ steps.version.outputs.current }}
+          
+          ${{ steps.changelog.outputs.content }}
+          
+          ---
+          
+          ### 📦 Installation
+          \`\`\`bash
+          npm install ai-spine-sdk@${{ steps.version.outputs.current }}
+          \`\`\`
+          
+          ### 📚 Links
+          - [View on npm](https://www.npmjs.com/package/ai-spine-sdk/v/${{ steps.version.outputs.current }})
+          - [Full Changelog](https://github.com/Dataframe-Consulting/ai-spine-sdk-js/blob/main/CHANGELOG.md)
+          EOF
+          
+          # Create release using GitHub CLI (pre-installed on runners)
+          gh release create v${{ steps.version.outputs.current }} \
+            --title "v${{ steps.version.outputs.current }}" \
+            --notes-file release-notes.md \
+            --latest
