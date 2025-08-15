@@ -56,13 +56,12 @@ export class AISpine {
       ? { apiKey: config }
       : config;
 
-    // API key is now required
+    // API key is optional for user management endpoints
+    // If no API key provided, use a dummy key (the user management endpoints don't require auth)
     if (!finalConfig.apiKey) {
-      throw new ValidationError('API key is required. Get yours at https://ai-spine.com/dashboard');
-    }
-
-    // Validate API key format
-    if (!finalConfig.apiKey.startsWith('sk_')) {
+      finalConfig.apiKey = 'sk_no_auth_required';
+      console.warn('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
+    } else if (!finalConfig.apiKey.startsWith('sk_')) {
       console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
     }
 
