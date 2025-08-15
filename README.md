@@ -383,7 +383,7 @@ import { AISpine } from 'ai-spine-sdk';
 
 // Initialize without API key for key management operations
 const spine = new AISpine({
-  apiKey: 'sk_dummy', // These endpoints don't use the API key
+  // apiKey is optional - user management methods don't require authentication
   baseURL: 'https://ai-spine-api.up.railway.app'
 });
 

@@ -6,8 +6,8 @@
 
 // Configuration Types
 export interface AISpineConfig {
-  /** API key for authentication (required - get from https://ai-spine.com/dashboard) */
-  apiKey: string;
+  /** API key for authentication (optional for user management endpoints) */
+  apiKey?: string;
   /** Base URL for the AI Spine API */
   baseURL?: string;
   /** Request timeout in milliseconds */

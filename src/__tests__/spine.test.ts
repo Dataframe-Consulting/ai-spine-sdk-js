@@ -23,14 +23,24 @@ describe('AISpine', () => {
       expect(spine).toBeInstanceOf(AISpine);
     });
 
-    it('should throw Error for missing API key', () => {
-      expect(() => {
-        new AISpine('');
-      }).toThrow('API key is required');
+    it('should allow initialization without API key for user management', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
       
-      expect(() => {
-        new AISpine({} as any);
-      }).toThrow('API key is required');
+      const spine = new AISpine({});
+      expect(spine).toBeInstanceOf(AISpine);
+      expect(warnSpy).toHaveBeenCalledWith('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
+      
+      warnSpy.mockRestore();
+    });
+
+    it('should handle empty string API key', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+      
+      const spine = new AISpine('');
+      expect(spine).toBeInstanceOf(AISpine);
+      expect(warnSpy).toHaveBeenCalledWith('No API key provided. Only user management methods (checkUserApiKey, generateUserApiKey, revokeUserApiKey) will work.');
+      
+      warnSpy.mockRestore();
     });
 
     it('should warn for invalid API key format', () => {

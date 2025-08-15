@@ -8,9 +8,9 @@
 const { AISpine } = require('ai-spine-sdk');
 
 // Initialize the SDK
-// Note: These endpoints don't require authentication, but we still need to pass a dummy key
+// Note: API key is optional for user management endpoints
 const spine = new AISpine({
-  apiKey: 'sk_dummy', // Not used for these endpoints
+  // No apiKey needed for user management methods
   baseURL: 'https://ai-spine-api.up.railway.app'
 });
 
@@ -125,7 +125,7 @@ class UserApiKeyManager {
   constructor(database) {
     this.db = database;
     this.spine = new AISpine({
-      apiKey: 'sk_dummy',
+      // No apiKey needed for user management methods
       baseURL: 'https://ai-spine-api.up.railway.app'
     });
   }

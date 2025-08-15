@@ -31,12 +31,12 @@ export class AISpineClient {
       config = { apiKey: config };
     }
 
-    // Validate API key
+    // API key is optional for user management endpoints
     if (!config.apiKey) {
-      throw new Error('API key is required. Get yours at https://ai-spine.com/dashboard');
+      config.apiKey = 'sk_no_auth_required';
     }
 
-    if (!config.apiKey.startsWith('sk_')) {
+    if (config.apiKey !== 'sk_no_auth_required' && !config.apiKey.startsWith('sk_')) {
       console.warn('API key should start with "sk_". Make sure you\'re using a valid user key.');
     }
 
@@ -58,7 +58,7 @@ export class AISpineClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': `Bearer ${this.config.apiKey}`,
-        'User-Agent': '@ai-spine/sdk-js/2.3.0',
+        'User-Agent': '@ai-spine/sdk-js/2.3.1',
       },
     });
 

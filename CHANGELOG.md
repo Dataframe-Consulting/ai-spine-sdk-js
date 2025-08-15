@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [2.3.1] - 2025-01-14
+
+### Fixed
+- API key is now optional when initializing the SDK for user management endpoints
+- Users can now access Settings page without an API key to generate their first key
+- Fixed initialization blocker that prevented users from using `checkUserApiKey`, `generateUserApiKey`, and `revokeUserApiKey` methods
+
+### Changed
+- SDK now initializes with a placeholder key (`sk_no_auth_required`) when no API key is provided
+- Console warning is shown when SDK is initialized without an API key
+- Updated examples and documentation to show API key is optional for user management
+
 ## [2.3.0] - 2025-01-14
 
 ### Added

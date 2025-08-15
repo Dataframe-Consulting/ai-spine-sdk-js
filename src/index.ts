@@ -136,7 +136,7 @@ export {
 } from './webhooks';
 
 // Version
-export const VERSION = '2.3.0';
+export const VERSION = '2.3.1';
 
 // Default export for convenience
 import { AISpine as DefaultExport } from './spine';
