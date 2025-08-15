@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-01-15
+
+### Added
+- **Flow CRUD Operations**: Full support for creating, reading, updating, and deleting flows
+  - `createFlow()` - Create new custom flows with Supabase authentication
+  - `getMyFlows()` - List all flows created by the authenticated user
+  - `updateFlow()` - Update existing flows (requires ownership)
+  - `deleteFlow()` - Delete flows (requires ownership, system flows protected)
+- New TypeScript types for flow management:
+  - `FlowDefinition` - Complete flow structure with metadata
+  - `FlowCreateRequest` - Request payload for creating flows
+  - `FlowUpdateRequest` - Request payload for updating flows
+  - `MyFlowsResponse` - Response from getMyFlows endpoint
+  - `FlowDeleteResponse` - Response from flow deletion
+- Flow versioning support - flows automatically increment version on update
+- Flow ownership tracking - only flow creators can modify/delete their flows
+- Comprehensive test suite for all flow CRUD operations
+
+### Changed
+- Flow type extended with new fields: `version`, `created_by`, `is_active`, `exit_points`
+- All flow CRUD operations require Supabase authentication token
+- System flows (without `created_by`) are protected from deletion
+
+### Security
+- Flow operations properly validate ownership before allowing modifications
+- Supabase token required for all flow management endpoints
+- User can only see and modify their own flows
+
 ## [2.4.2] - 2025-01-14
 
 ### Fixed

@@ -54,6 +54,13 @@ export type {
   Metrics,
   HealthCheck,
   
+  // Flow CRUD types (NEW in v2.5.0)
+  FlowDefinition,
+  FlowCreateRequest,
+  FlowUpdateRequest,
+  MyFlowsResponse,
+  FlowDeleteResponse,
+  
   // Environment variables (NEW in v2.1.0)
   AgentEnvironmentField,
   AgentEnvironmentSchema,
@@ -141,7 +148,7 @@ export {
 } from './webhooks';
 
 // Version
-export const VERSION = '2.4.2';
+export const VERSION = '2.5.0';
 
 // Default export for convenience
 import { AISpine as DefaultExport } from './spine';

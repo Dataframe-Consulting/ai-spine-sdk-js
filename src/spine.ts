@@ -10,6 +10,11 @@ import {
   Agent,
   AgentConfig,
   Flow,
+  FlowDefinition,
+  FlowCreateRequest,
+  FlowUpdateRequest,
+  MyFlowsResponse,
+  FlowDeleteResponse,
   FlowExecutionRequest,
   ExecutionContext,
   ExecutionResponse,
@@ -1011,5 +1016,172 @@ export class AISpine {
    */
   public async checkCredits(options: RequestOptions = {}): Promise<number> {
     return this.client.checkCredits();
+  }
+
+  // Flow CRUD Methods (Using Supabase Token)
+
+  /**
+   * Create a new flow (requires Supabase authentication)
+   * 
+   * @param flowData - The flow definition to create
+   * @returns Promise resolving to the created flow
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const flow = await spine.createFlow({
+   *   flow_id: 'my-custom-flow',
+   *   name: 'My Custom Flow',
+   *   description: 'A custom workflow',
+   *   nodes: [...],
+   *   entry_point: 'input',
+   *   exit_points: ['output']
+   * });
+   * ```
+   */
+  public async createFlow(flowData: FlowCreateRequest): Promise<FlowDefinition> {
+    const config = this.client.getConfig();
+    if (!config.supabaseToken) {
+      throw new ValidationError('Supabase token is required for creating flows');
+    }
+
+    // Validate flow data
+    if (!flowData.flow_id || !flowData.name || !flowData.nodes || !flowData.entry_point) {
+      throw new ValidationError('flow_id, name, nodes, and entry_point are required');
+    }
+
+    const response = await this.client.post<FlowDefinition>(
+      '/api/v1/flows',
+      flowData,
+      {
+        headers: {
+          'Authorization': `Bearer ${config.supabaseToken}`
+        }
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Get all flows created by the current user (requires Supabase authentication)
+   * 
+   * @returns Promise resolving to user's flows
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const result = await spine.getMyFlows();
+   * console.log(`You have ${result.count} flows`);
+   * result.flows.forEach(flow => {
+   *   console.log(`- ${flow.name} (${flow.flow_id})`);
+   * });
+   * ```
+   */
+  public async getMyFlows(): Promise<MyFlowsResponse> {
+    const config = this.client.getConfig();
+    if (!config.supabaseToken) {
+      throw new ValidationError('Supabase token is required for getting user flows');
+    }
+
+    const response = await this.client.get<MyFlowsResponse>(
+      '/api/v1/flows/my-flows',
+      undefined,
+      {
+        headers: {
+          'Authorization': `Bearer ${config.supabaseToken}`
+        }
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Update an existing flow (requires ownership and Supabase authentication)
+   * 
+   * @param flowId - The flow ID to update
+   * @param updates - The updates to apply
+   * @returns Promise resolving to the updated flow
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const updated = await spine.updateFlow('my-custom-flow', {
+   *   name: 'Updated Flow Name',
+   *   description: 'Updated description',
+   *   nodes: [...]
+   * });
+   * console.log('Flow version:', updated.version);
+   * ```
+   */
+  public async updateFlow(flowId: string, updates: FlowUpdateRequest): Promise<FlowDefinition> {
+    const config = this.client.getConfig();
+    if (!config.supabaseToken) {
+      throw new ValidationError('Supabase token is required for updating flows');
+    }
+
+    if (!flowId) {
+      throw new ValidationError('Flow ID is required');
+    }
+
+    const response = await this.client.put<FlowDefinition>(
+      `/api/v1/flows/${flowId}`,
+      updates,
+      {
+        headers: {
+          'Authorization': `Bearer ${config.supabaseToken}`
+        }
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * Delete a flow (requires ownership and Supabase authentication)
+   * 
+   * @param flowId - The flow ID to delete
+   * @returns Promise resolving to deletion confirmation
+   * 
+   * @example
+   * ```typescript
+   * const spine = new AISpine({
+   *   supabaseToken: session.access_token
+   * });
+   * 
+   * const result = await spine.deleteFlow('my-custom-flow');
+   * console.log(result.message); // 'Flow deleted successfully'
+   * ```
+   */
+  public async deleteFlow(flowId: string): Promise<FlowDeleteResponse> {
+    const config = this.client.getConfig();
+    if (!config.supabaseToken) {
+      throw new ValidationError('Supabase token is required for deleting flows');
+    }
+
+    if (!flowId) {
+      throw new ValidationError('Flow ID is required');
+    }
+
+    const response = await this.client.delete<FlowDeleteResponse>(
+      `/api/v1/flows/${flowId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${config.supabaseToken}`
+        }
+      }
+    );
+
+    return response.data;
   }
 }

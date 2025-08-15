@@ -154,9 +154,59 @@ export interface Flow {
   description: string;
   nodes: FlowNode[];
   entry_point?: string;
+  exit_points?: string[];
   metadata?: Record<string, any>;
+  version?: number;
+  created_by?: string;
+  is_active?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+// Flow CRUD Types
+export interface FlowDefinition {
+  flow_id: string;
+  name: string;
+  description: string;
+  nodes: FlowNode[];
+  entry_point: string;
+  exit_points?: string[];
+  metadata?: Record<string, any>;
+  version?: number;
+  created_by?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FlowCreateRequest {
+  flow_id: string;
+  name: string;
+  description: string;
+  nodes: FlowNode[];
+  entry_point: string;
+  exit_points?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface FlowUpdateRequest {
+  name?: string;
+  description?: string;
+  nodes?: FlowNode[];
+  entry_point?: string;
+  exit_points?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface MyFlowsResponse {
+  flows: FlowDefinition[];
+  count: number;
+  user_id: string;
+}
+
+export interface FlowDeleteResponse {
+  message: string;
+  status: 'deleted';
 }
 
 export interface FlowExecutionRequest {
