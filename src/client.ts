@@ -26,7 +26,7 @@ import {
 
 export class AISpineClient {
   private readonly http: AxiosInstance;
-  private readonly config: Required<AISpineConfig>;
+  private readonly config: AISpineConfig & { apiKey: string };
 
   constructor(config: AISpineConfig | string) {
     // Backward compatibility
@@ -59,12 +59,12 @@ export class AISpineClient {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Authorization': `Bearer ${this.config.apiKey}`,
-      'X-SDK-Version': 'ai-spine-sdk-js/2.4.1',
+      'X-SDK-Version': 'ai-spine-sdk-js/2.4.2',
     };
 
     // Only add User-Agent in Node.js environment (not in browsers)
     if (typeof window === 'undefined') {
-      headers['User-Agent'] = '@ai-spine/sdk-js/2.4.1';
+      headers['User-Agent'] = '@ai-spine/sdk-js/2.4.2';
     }
 
     this.http = axios.create({
@@ -121,7 +121,7 @@ export class AISpineClient {
     // Network or timeout errors
     if (!error.response) {
       if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
-        return new TimeoutError(this.config.timeout);
+        return new TimeoutError(this.config.timeout || 30000);
       }
       return new NetworkError(error.message, { 
         code: error.code,
@@ -138,7 +138,7 @@ export class AISpineClient {
     requestFn: () => Promise<AxiosResponse<T>>,
     options: RequestOptions = {}
   ): Promise<SDKResponse<T>> {
-    const maxRetries = options.retries ?? this.config.retries;
+    const maxRetries = options.retries ?? this.config.retries ?? 3;
     let lastError: AISpineError;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -432,7 +432,7 @@ export class AISpineClient {
 
   // Utility Methods
 
-  public getConfig(): Required<AISpineConfig> {
+  public getConfig(): AISpineConfig & { apiKey: string } {
     return { ...this.config };
   }
 
