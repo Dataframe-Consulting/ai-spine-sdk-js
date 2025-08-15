@@ -55,15 +55,22 @@ export class AISpineClient {
     }
 
     // Create axios instance
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${this.config.apiKey}`,
+      'X-SDK-Version': 'ai-spine-sdk-js/2.4.1',
+    };
+
+    // Only add User-Agent in Node.js environment (not in browsers)
+    if (typeof window === 'undefined') {
+      headers['User-Agent'] = '@ai-spine/sdk-js/2.4.1';
+    }
+
     this.http = axios.create({
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
-        'User-Agent': '@ai-spine/sdk-js/2.4.0',
-      },
+      headers,
     });
 
     // Setup interceptors
