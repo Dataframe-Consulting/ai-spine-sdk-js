@@ -328,6 +328,105 @@ const flow = await spine.createFlow({
 - **`boolean`**: True/false values
 - **`password`**: Sensitive fields (API keys, secrets) - handled as strings but marked as sensitive for UI
 
+## 🔑 API Key Management
+
+The SDK provides methods to manage user API keys programmatically. These methods **do not require authentication** and are designed to be used from your backend to manage API keys for your users.
+
+### Check if user has API key
+
+```typescript
+const userId = '123e4567-e89b-12d3-a456-426614174000'; // Supabase Auth user ID
+const status = await spine.checkUserApiKey(userId);
+
+if (!status.has_api_key) {
+  console.log('User does not have an API key');
+} else {
+  console.log('API Key:', status.api_key);
+  console.log('Credits:', status.credits);
+  console.log('Rate limit:', status.rate_limit);
+  console.log('Created at:', status.created_at);
+  console.log('Last used:', status.last_used_at);
+}
+```
+
+### Generate or regenerate API key
+
+```typescript
+const userId = '123e4567-e89b-12d3-a456-426614174000';
+
+// This will create a new key if none exists, or regenerate if one already exists
+const result = await spine.generateUserApiKey(userId);
+
+console.log('Action:', result.action); // 'created' or 'regenerated'
+console.log('New API Key:', result.api_key);
+console.log('Message:', result.message);
+
+// Save this key securely - it won't be shown again!
+```
+
+### Revoke API key
+
+```typescript
+const userId = '123e4567-e89b-12d3-a456-426614174000';
+
+// Permanently delete the user's API key
+const result = await spine.revokeUserApiKey(userId);
+
+console.log('Status:', result.status); // 'revoked'
+console.log('Message:', result.message);
+```
+
+### Complete workflow example
+
+```typescript
+import { AISpine } from 'ai-spine-sdk';
+
+// Initialize without API key for key management operations
+const spine = new AISpine({
+  apiKey: 'sk_dummy', // These endpoints don't use the API key
+  baseURL: 'https://ai-spine-api-production.up.railway.app'
+});
+
+async function manageUserApiKey(userId: string) {
+  // 1. Check if user has an API key
+  const status = await spine.checkUserApiKey(userId);
+  
+  if (!status.has_api_key) {
+    // 2. Generate first API key
+    const generated = await spine.generateUserApiKey(userId);
+    console.log('Created new API key:', generated.api_key);
+    
+    // Store this key securely in your database
+    await saveApiKeyToDatabase(userId, generated.api_key);
+    
+    return generated.api_key;
+  }
+  
+  // User already has a key
+  return status.api_key;
+}
+
+async function regenerateCompromisedKey(userId: string) {
+  // Regenerate if key is compromised
+  const regenerated = await spine.generateUserApiKey(userId);
+  console.log('New API key:', regenerated.api_key);
+  
+  // Update stored key
+  await updateApiKeyInDatabase(userId, regenerated.api_key);
+  
+  return regenerated.api_key;
+}
+
+async function removeUserAccess(userId: string) {
+  // Revoke API key when user account is deleted or suspended
+  await spine.revokeUserApiKey(userId);
+  console.log('User API key has been revoked');
+  
+  // Clean up database
+  await removeApiKeyFromDatabase(userId);
+}
+```
+
 ## 🔧 Advanced Usage
 
 ### Error handling
